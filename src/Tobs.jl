@@ -9,3 +9,5 @@ function Tobs(X::AbstractArray, μ::Real, σ2::Real)
         X[i] > μ ?  χi += (X[i] - μ)^2 / σ2 : (append!(χ2, χi); χi = 0)
     return maximum(χ2)
 end
+
+println(Tobs([-1, 1, 3, -2], 0, 1))
