@@ -92,8 +92,24 @@ end
 println(Partition(8, 2))
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #=
 
+Not really necessary. 
+Also, doesn't work, indexing needs to be fixed for Julia 
 
 # Implementation of Algorithm Z from 
 #A. Zoghbi: Algorithms for generating integer partitions, Ottawa (1993)
