@@ -38,14 +38,14 @@ function CacheChi2(Tobs::Float64, N::Int)::AbstractArray{Float64}
     #create team of threads somehow?
 
     for i in range(2, N)
-        res[i] = log(Float64(cquantile(Chisq(Tobs), i)))
+        res[i] = log(cquantile(Chisq(Tobs), i))
     end
 
     return res
 end
 
 
-function cumulative(Tobs::Float64, N:UInt)::Float64
+function cumulative(Tobs::Float64, N:Int)::Float64
     
     CacheFactorials(N)
 

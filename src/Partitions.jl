@@ -6,6 +6,26 @@
 
 # the vectors for the multiplicities and parts have a buffer value at index 1
 
+struct Partition 
+
+    mult()::Vector{Int}
+        return c
+    end
+    parts()::Vector{Int}
+        return y
+    end
+    distinct_parts()::Int
+        return h
+    end
+
+
+    c::Vector{Int}
+    y::Vector{Int}
+    n::Int
+    h::Int
+
+end
+
 function Partition(n::Int, k::Int)
 
     # @argcheck 0 <= k < n
@@ -86,13 +106,20 @@ function Partition(n::Int, k::Int)
         c[h+ 1] = 1
     end
 
-    return c, y, h
+    return Partition(c, y, n, h)
 end
 
-println(Partition(8, 2))
+function inc!(p::Partition)
+    if final_partition(p)
+        done = true
+    else
+        println("he")
+    end
 
+    return p
+end
 
-
+#find done??
 
 
 
