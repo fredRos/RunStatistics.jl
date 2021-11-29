@@ -8,16 +8,8 @@
 
 struct Partition 
 
-    mult()::Vector{Int}
-        return c
-    end
-    parts()::Vector{Int}
-        return y
-    end
-    distinct_parts()::Int
-        return h
-    end
 
+    # some stuff with storage adresses 
 
     c::Vector{Int}
     y::Vector{Int}
@@ -25,6 +17,60 @@ struct Partition
     h::Int
 
 end
+
+struct AbstractPartitionGenerator
+
+    function bool(p::AbstractPartitionGenerator)
+        return !p.done
+    end
+
+    # some stuff again with adresses
+    AbstractPartitionGenerator(p::Partition)
+
+    function final_partition(p::partition)
+        return p.y[p.h + 1] - p.y[2] <= 1 
+    end
+    
+    
+    # might be a problem, is 'virtual bool' in c++
+    done::Bool
+    p::typeof(p) # does this make sense?
+end
+
+
+
+struct PartitionsGenerator <: AbstractPartitionGenerator
+    PartitionsGenerator(n::Int, k::Int)
+
+    operator++()::PartitionsGenerator
+     # problem with final_partition() in parent, how does the override work in julia?
+
+
+end
+
+
+function PartitionGenerator.final_partition()
+    return
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function Partition(n::Int, k::Int)
 
