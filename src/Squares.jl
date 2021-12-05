@@ -44,7 +44,7 @@ function CacheChi2(Tobs::Float64, N::Int)
     return res
 end
 
-test = CacheChi2(6.8, 5)
+
 
 
 function cumulative(Tobs::Float64, N::Int)
@@ -70,7 +70,7 @@ function cumulative(Tobs::Float64, N::Int)
             scale = poch - logpow2N1
             ppi = 0.0
 
-            g = Partition(r, M)
+            g = partition(r, M)
             n = g.c
             y = g.y
 
@@ -96,13 +96,9 @@ function cumulative(Tobs::Float64, N::Int)
     return p
 end
 
-ctest = cumulative(6.8, 5)
 
 
 function pvalue(Tobs::Float64, N::Int)
     return 1 - cumulative(Tobs, N)    
 end
 
-ptest = pvalue(6.8, 5)
-
-println(ptest)
