@@ -6,7 +6,7 @@
 
 # the vectors for the multiplicities and parts have a buffer value at index 1
 
-mutable struct Parti # could apparently be an issue with performance because of redifining the partition attributes in the process of updating the partition in place
+mutable struct Partition # could apparently be an issue with performance because of redifining the partition attributes in the process of updating the partition in place
 
 
     # some stuff with storage adresses 
@@ -17,7 +17,6 @@ mutable struct Parti # could apparently be an issue with performance because of 
     h::Int
     done::Bool
 end
-
 #=
 struct AbstractPartitionGenerator
 
@@ -60,7 +59,7 @@ end
 
 # IMPORTANT: when reading partitions of n into k parts by this algorithm, ignore the first element c[1], y[1] and do not read beyond c[h + 1], y[h + 1]
 
-function partition(n::Int, k::Int)
+function Partition(n::Int, k::Int)
 
     # @argcheck 0 <= k < n
 

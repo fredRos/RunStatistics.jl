@@ -6,7 +6,6 @@ using Distributions
 
 
 log_factorial = []
-include("Partitions.jl")
 
 
 function CacheFactorials(N::Int)
@@ -70,7 +69,7 @@ function cumulative(Tobs::Float64, N::Int)
             scale = poch - logpow2N1
             ppi = 0.0
 
-            g = partition(r, M)
+            g = Partition(r, M)
             n = g.c
             y = g.y
 
