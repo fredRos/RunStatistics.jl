@@ -3,6 +3,8 @@ uuid = "c967b8ff-7eea-41b9-8a9d-36c76a634080"
 version = "0.1.0"
 
 [deps]
+ArgCheck = "dce04be8-c92d-5529-be00-80e4d2c0e197"
+Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 
 [compat]
 julia = "1"
