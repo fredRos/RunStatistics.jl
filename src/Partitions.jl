@@ -6,7 +6,7 @@
 
 # the vectors for the multiplicities and parts have a buffer value at index 1
 
-struct Partition 
+mutable struct Partition 
 
 
     # some stuff with storage adresses 
@@ -15,9 +15,10 @@ struct Partition
     y::Vector{Int}
     n::Int
     h::Int
-
+    done::Bool
 end
 
+#=
 struct AbstractPartitionGenerator
 
     function bool(p::AbstractPartitionGenerator)
@@ -53,24 +54,11 @@ function PartitionGenerator.final_partition()
     return
 end
 
+=#
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# IMPORTANT: when reading partitions of n into k parts by this algorithm, ignore the first element c[1], y[1] and do not read beyond c[h + 1], y[h + 1]
 
 function Partition(n::Int, k::Int)
 
@@ -95,66 +83,94 @@ function Partition(n::Int, k::Int)
         y[2] = maxPart
         c[2] = n / maxPart
         h = 1
+        done = true
     else
         y[2] = 1 
         c[2] = k - 1
         y[3] = maxPart
         c[3] = 1
         h = 2
+        done = false 
     end
 
+     
+    return Partition(c, y, n, h, done)
+end 
 
-    # running index
-    i = h
-    # calculated part
-    p = c[h + 1]
-    #calculated remainder
-    r = c[h + 1] * y[h + 1]
 
-    # Update step inside the while loop of algorithm Z from
-    # A. Zoghbi: Algorithms for generating integer partitions, Ottawa (1993)
 
-    # calculate remainder
-    while (y[h + 1] - y[i]) < 2
-        p += c[i]
-        r += c[i] * y[i]
-        i -= 1
-    end
+function iterate!(p::Partition)
 
-    # update current part when it equals 1
-    if c[i] == 1
-        if i != 1
+    # first check if the final partition has already been reached 
+    if final_partition(p)
+        p.done = true
+    else  
+        c = p.c
+        y = p.y
+        h = p.h
+
+        # running index
+        i = h
+        # calculated part
+        k = c[h + 1]
+        #calculated remainder
+        r = c[h + 1] * y[h + 1]
+
+        # Update step inside the while loop of algorithm Z from
+        # A. Zoghbi: Algorithms for generating integer partitions, Ottawa (1993)
+
+        # calculate remainder
+        while (y[h + 1] - y[i]) < 2
+            k += c[i]
             r += c[i] * y[i]
-            y[i] += 1
-        else
-            i = 2
-            y[i] = 1
+            i -= 1
         end
-    else
-        c[i] -= 1
-        r += y[i]
-        i += 1
-        y[i] = y[i - 1] + 1 
+
+        # update current part when it equals 1
+        if c[i] == 1
+            if i != 1
+                r += c[i] * y[i]
+                y[i] += 1
+            else
+                i = 2
+                y[i] = 1
+            end
+        else
+            c[i] -= 1
+            r += y[i]
+            i += 1
+            y[i] = y[i - 1] + 1 
+        end
+
+        # calculate next parts based on remainder left from previous update
+        c[i] = k
+        r -= c[i] * y[i]
+        h = i 
+
+        # update last modified part if it's the remainder
+        if (r == y[i])
+            c[i] += 1
+            h = i - 1
+        # add new part with multiplicity 1
+        else
+            y[h + 1] = r
+            c[h+ 1] = 1
+        end
+
+        p.c = c
+        p.y = y
+        p.h = h
+        return p 
     end
-
-    # calculate next parts based on remainder left from previous update
-    c[i] = p
-    r -= c[i] * y[i]
-    h = i 
-
-    # update last modified part if it's the remainder
-    if (r == y[i])
-        c[i] += 1
-        h = i - 1
-    # add new part with multiplicity 1
-    else
-        y[h + 1] = r
-        c[h+ 1] = 1
-    end
-
-    return Partition(c, y, n, h)
 end
 
+
+function final_partition(p::Partition)
+    return p.y[p.h + 1] - p.y[2] <= 1 
+end 
+
+
+#=
 function inc!(p::Partition)
     if final_partition(p)
         done = true
@@ -164,6 +180,7 @@ function inc!(p::Partition)
 
     return p
 end
+=#
 
 #find done??
 

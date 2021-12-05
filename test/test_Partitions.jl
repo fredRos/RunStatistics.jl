@@ -3,6 +3,6 @@
 using RunStatistics
 using Test
 
-#@testset "Partitions" begin
-#    @test RunStatistics.Partitions(5)
-#end
+@testset "Partitions" begin
+    @test 1 == 1 # need to think of a proper test 
+end

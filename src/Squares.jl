@@ -2,14 +2,14 @@
 
 
 using ArgCheck
-using QNaNs
+using Distributions
 
 
-log_factorial = [] ::AbstractArray{Float64}
+log_factorial = []
+include("Partitions.jl")
 
 
-
-function CacheFactorials(N::Int)::Unsigned
+function CacheFactorials(N::Int)
     if N < length(log_factorial)
         return length(log_factorial)
     end
@@ -17,7 +17,7 @@ function CacheFactorials(N::Int)::Unsigned
     sizehint!(log_factorial, N)
 
     if isempty(log_factorial)
-        push!(log_factorial, 0.0) # make sure this is an ok substitute for 0L in c++
+        push!(log_factorial, 0.0)
     end 
 
     for i in length(log_factorial) : N
@@ -28,34 +28,36 @@ function CacheFactorials(N::Int)::Unsigned
 end
 
 
-function CacheChi2(Tobs::Float64, N::Int)::AbstractArray{Float64}
+function CacheChi2(Tobs::Float64, N::Int)
     
-    @argcheck 0 < N
+    # @argcheck 0 < N
 
     res = zeros(N + 1)
-    res[1] = qnan(0) # ? does this fulfill the intended purpose?
+    res[1] = NaN # ? does this fulfill the intended purpose?
 
     #create team of threads somehow?
 
-    for i in range(2, N)
-        res[i] = log(cquantile(Chisq(Tobs), i))
+    for i in range(2, N + 1)
+        res[i] = log(cdf(Chisq(Tobs), i))
     end
 
     return res
 end
 
+test = CacheChi2(6.8, 5)
 
-function cumulative(Tobs::Float64, N:Int)::Float64
+
+function cumulative(Tobs::Float64, N::Int)
     
     CacheFactorials(N)
 
-    log_cumulative = CacheChi2(Tons, N) # find analogon for 'auto' from c++ in julia 
+    log_cumulative = CacheChi2(Tobs, N)
 
-    poch = 0.0::Float64 
+    poch = 0.0
 
-    logpow2N1 = (N <= 63) ? log((1 << N) - 1) : N * log(2) # find analogon for 'const' from c++ in julia; also does the bitshift work properly?
+    logpow2N1 = (N <= 63) ? log((1 << N) - 1) : N * log(2) 
 
-    p = 0.0::Float64
+    p = 0.0
 
     #again create team of threads
 
@@ -64,20 +66,43 @@ function cumulative(Tobs::Float64, N:Int)::Float64
         poch = 0
 
         for M in range(1, Mmax)
-            poch += log(Float64(N - r + 2 - M))
-            scale = poch - logpow2N1::Float64
-            ppi = 0.0::Float64
+            poch += log(N - r + 2 - M)
+            scale = poch - logpow2N1
+            ppi = 0.0
 
-            g(r, M) = e
+            g = Partition(r, M)
+            n = g.c
+            y = g.y
 
+            check = true
+            while check
+                h = g.h
+
+                ppartition = 0
+                for l in range(2, h + 1)
+                    ppartition += n[l] * log_cumulative[y[l] + 1] - log_factorial[n[l] + 1]
+                end 
+                ppi += exp(ppartition)
+                
+                check = !final_partition(g)
+                iterate!(g)
+            end
+
+            p += exp(scale + log(ppi))
         end
     end
 
+    # assert p<1
     return p
 end
 
+ctest = cumulative(6.8, 5)
 
-function pvalue(Tobs::Float64, N:Int)::Float64
+
+function pvalue(Tobs::Float64, N::Int)
     return 1 - cumulative(Tobs, N)    
 end
 
+ptest = pvalue(6.8, 5)
+
+println(ptest)
