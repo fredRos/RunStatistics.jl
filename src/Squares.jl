@@ -4,11 +4,13 @@
 using ArgCheck
 using Distributions
 
+include("Partitions.jl") # just for debugging
+
 
 log_factorial = []
 
 
-function CacheFactorials(N::Int)
+function CacheFactorials(N)
     if N < length(log_factorial)
         return length(log_factorial)
     end
@@ -19,12 +21,15 @@ function CacheFactorials(N::Int)
         push!(log_factorial, 0.0)
     end 
 
-    for i in length(log_factorial) : N
-        push!(log_factorial, last(log_factorial) + log(Float64(i)))
+    for i in range(2, N)
+        push!(log_factorial, last(log_factorial) + log(i))
     end
 
     return length(log_factorial)
 end
+
+
+
 
 
 function CacheChi2(Tobs::Float64, N::Int)
@@ -73,7 +78,7 @@ function cumulative(Tobs::Float64, N::Int)
             n = g.c
             y = g.y
 
-            check = true
+            check = true # to assure that the initial partition is also counted 
             while check
                 h = g.h
 
@@ -95,7 +100,7 @@ function cumulative(Tobs::Float64, N::Int)
     return p
 end
 
-
+ptest = cumulative(6.8, 5)
 
 function pvalue(Tobs::Float64, N::Int)
     return 1 - cumulative(Tobs, N)    
