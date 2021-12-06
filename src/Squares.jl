@@ -4,8 +4,6 @@
 using ArgCheck
 using Distributions
 
-include("Partitions.jl") # just for debugging
-
 
 log_factorial = []
 
@@ -21,7 +19,7 @@ function CacheFactorials(N)
         push!(log_factorial, 0.0)
     end 
 
-    for i in range(2, N)
+    for i in range(length(log_factorial), N)
         push!(log_factorial, last(log_factorial) + log(i))
     end
 
