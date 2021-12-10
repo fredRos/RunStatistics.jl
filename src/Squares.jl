@@ -7,8 +7,9 @@ using Distributions
 
 log_factorial = []
 
+# include("Partitions.jl")
 
-function CacheFactorials(N::Int)
+function CacheFactorials(N)
     if N < length(log_factorial)
         return length(log_factorial)
     end
@@ -19,12 +20,15 @@ function CacheFactorials(N::Int)
         push!(log_factorial, 0.0)
     end 
 
-    for i in length(log_factorial) : N
-        push!(log_factorial, last(log_factorial) + log(Float64(i)))
+    for i in range(length(log_factorial), N)
+        push!(log_factorial, last(log_factorial) + log(i))
     end
 
     return length(log_factorial)
 end
+
+
+
 
 
 function CacheChi2(Tobs::Float64, N::Int)
@@ -37,7 +41,7 @@ function CacheChi2(Tobs::Float64, N::Int)
     #create team of threads somehow?
 
     for i in range(2, N + 1)
-        res[i] = log(cdf(Chisq(Tobs), i))
+        res[i] = logcdf(Chisq(i - 1), Tobs)
     end
 
     return res
@@ -73,7 +77,7 @@ function cumulative(Tobs::Float64, N::Int)
             n = g.c
             y = g.y
 
-            check = true
+            check = true # to assure that the initial partition is also counted 
             while check
                 h = g.h
 
@@ -95,7 +99,7 @@ function cumulative(Tobs::Float64, N::Int)
     return p
 end
 
-
+# println(cumulative(3.4, 10), " ", cumulative(6.5, 20), " ", cumulative(9.0, 6), " ", cumulative(5.4, 4), " ", cumulative(3.9, 11)) 
 
 function pvalue(Tobs::Float64, N::Int)
     return 1 - cumulative(Tobs, N)    
