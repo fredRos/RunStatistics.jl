@@ -7,10 +7,7 @@
 # the vectors for the multiplicities and parts have a buffer value at index 1
 
 mutable struct Partition # could apparently be an issue with performance because of redifining the partition attributes in the process of updating the partition in place
-
-
-    # some stuff with storage adresses 
-
+    # some stuff with storage adresses
     c::Vector{Int}
     y::Vector{Int}
     n::Int

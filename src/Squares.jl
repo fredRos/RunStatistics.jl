@@ -7,6 +7,7 @@ using Distributions
 
 log_factorial = []
 
+# include("Partitions.jl")
 
 function CacheFactorials(N)
     if N < length(log_factorial)
@@ -40,7 +41,7 @@ function CacheChi2(Tobs::Float64, N::Int)
     #create team of threads somehow?
 
     for i in range(2, N + 1)
-        res[i] = log(cdf(Chisq(Tobs), i))
+        res[i] = logcdf(Chisq(i - 1), Tobs)
     end
 
     return res
@@ -98,7 +99,7 @@ function cumulative(Tobs::Float64, N::Int)
     return p
 end
 
-ptest = cumulative(6.8, 5)
+# println(cumulative(3.4, 10), " ", cumulative(6.5, 20), " ", cumulative(9.0, 6), " ", cumulative(5.4, 4), " ", cumulative(3.9, 11)) 
 
 function pvalue(Tobs::Float64, N::Int)
     return 1 - cumulative(Tobs, N)    
