@@ -1,64 +1,35 @@
 # This file is a part of RunStatistics.jl, licensed under the MIT License (MIT).
 
 # Implements the algorithm from squares.cxx in https://github.com/fredRos/runs 
-# to obtain the partition of n into k parts 
-# returns a triple c, y, h with n = \sum_{i=1}^h c_i * y_i
 
-# the vectors for the multiplicities and parts have a buffer value at index 1
 
+
+"""
+    Partition(c::Vector{Int}, y::Vector{Int}, n::Int, h::Int, done::Bool)
+
+Represent the integer partition of n into k parts, with n = \sum_{i=1}^h c_i * y_i; h is the number of distinct parts, y the parts and c their multiplicities.
+
+Important: ignore first element of c and y and do not read beyond c[h + 1], y[h + 1].
+"""
 mutable struct Partition # could apparently be an issue with performance because of redifining the partition attributes in the process of updating the partition in place
-    # some stuff with storage adresses
+    # is it sensible to use pointers instead of actual variables?
     c::Vector{Int}
     y::Vector{Int}
     n::Int
     h::Int
     done::Bool
 end
-#=
-struct AbstractPartitionGenerator
 
-    function bool(p::AbstractPartitionGenerator)
-        return !p.done
-    end
+"""
+    partition(n::Int, k::Int)
 
-    # some stuff again with adresses
-    AbstractPartitionGenerator(p::Partition)
+Initiate the first partition of an integer 'n' into 'k' parts, arguments must satisfy 0 < k <= n. 
 
-    function final_partition(p::partition)
-        return p.y[p.h + 1] - p.y[2] <= 1 
-    end
-    
-    
-    # might be a problem, is 'virtual bool' in c++
-    done::Bool
-    p::typeof(p) # does this make sense?
-end
+Returns an object of type Partition. The vecors c and y have buffer values at index 1
+"""
+function partition(n::Int, k::Int)
 
-
-
-struct PartitionsGenerator <: AbstractPartitionGenerator
-    PartitionsGenerator(n::Int, k::Int)
-
-    operator++()::PartitionsGenerator
-     # problem with final_partition() in parent, how does the override work in julia?
-
-
-end
-
-
-function PartitionGenerator.final_partition()
-    return
-end
-
-=#
-
-
-
-# IMPORTANT: when reading partitions of n into k parts by this algorithm, ignore the first element c[1], y[1] and do not read beyond c[h + 1], y[h + 1]
-
-function Partition(n::Int, k::Int)
-
-    # @argcheck 0 <= k < n
+    @assert 0 < k <= n
 
     # multiplicities
     c = zeros(k+1)
@@ -94,7 +65,11 @@ function Partition(n::Int, k::Int)
 end 
 
 
+"""
+    iterate!(p::partition)
 
+Compute the next partition of 'p', updating it in place, returns an object of type partition. 
+"""
 function iterate!(p::Partition)
 
     # first check if the final partition has already been reached 
@@ -161,10 +136,61 @@ function iterate!(p::Partition)
 end
 
 
+"""
+    final_partition(p::partition)
+
+Check whether 'p' is the final partition. Returns a boolean.
+"""
 function final_partition(p::Partition)
     return p.y[p.h + 1] - p.y[2] <= 1 
 end 
 
+
+
+
+
+
+#=
+struct AbstractPartitionGenerator
+
+    function bool(p::AbstractPartitionGenerator)
+        return !p.done
+    end
+
+    # some stuff again with adresses
+    AbstractPartitionGenerator(p::Partition)
+
+    function final_partition(p::partition)
+        return p.y[p.h + 1] - p.y[2] <= 1 
+    end
+    
+    
+    # might be a problem, is 'virtual bool' in c++
+    done::Bool
+    p::typeof(p) # does this make sense?
+end
+
+
+
+struct PartitionsGenerator <: AbstractPartitionGenerator
+    PartitionsGenerator(n::Int, k::Int)
+
+    operator++()::PartitionsGenerator
+     # problem with final_partition() in parent, how does the override work in julia?
+
+
+end
+
+
+function PartitionGenerator.final_partition()
+    return
+end
+
+=#
+
+
+
+# !!!IMPORTANT!!!: when reading partitions of n into k parts by this algorithm, ignore the first element c[1], y[1] and do not read beyond c[h + 1], y[h + 1]
 
 #=
 function inc!(p::Partition)
