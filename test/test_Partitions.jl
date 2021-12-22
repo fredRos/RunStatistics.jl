@@ -3,7 +3,7 @@
 using RunStatistics
 using Test
 
-p = RunStatistics.Partition(6, 3)
+p = RunStatistics.partition(6, 3)
 
 @testset "partitions" begin
 
