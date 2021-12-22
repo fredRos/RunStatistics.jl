@@ -16,3 +16,27 @@ function Tobs(X::AbstractArray, μ::Real, σ2::Real)
     end 
     return maximum(χ2)
 end
+
+
+#=
+
+example of docstring? 
+
+"""
+    RunStatistics.hello_world()
+
+Prints "Hello, World!" and returns 42.
+
+```jldoctest
+using RunStatistics
+
+RunStatistics.hello_world()
+
+# output
+
+Hello, World!
+42
+```
+"""
+
+=#

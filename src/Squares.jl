@@ -5,9 +5,10 @@ using ArgCheck
 using Distributions
 
 
+#include("partitions.jl")
+
 log_factorial = []
 
-# include("Partitions.jl")
 
 function CacheFactorials(N)
     if N < length(log_factorial)
@@ -73,7 +74,7 @@ function cumulative(Tobs::Float64, N::Int)
             scale = poch - logpow2N1
             ppi = 0.0
 
-            g = Partition(r, M)
+            g = partition(r, M)
             n = g.c
             y = g.y
 
