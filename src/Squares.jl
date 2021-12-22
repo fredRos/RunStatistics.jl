@@ -5,6 +5,8 @@ using ArgCheck
 using Distributions
 
 
+#include("partitions.jl")
+
 log_factorial = []
 
 

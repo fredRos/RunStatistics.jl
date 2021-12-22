@@ -1,15 +1,18 @@
 # This file is a part of RunStatistics.jl, licensed under the MIT License (MIT).
 
 using Distributions
-using GSL
-using HCubature
-using StaticArrays
+#using GSL
+#using HCubature
+#using StaticArrays
+using QuadGK
+
+#include("squares.jl")
 
 # in many cases the Float64s here could probably be of a smaller type e.g. Float34 or something. check if it  makes a difference
 
 # fred often works with pointers to storage locations of values of variables instead of variables themselves. Check how to do that properly here
 
-mutable struct IntegrandData # decide if actually needs to be mutable
+mutable struct IntegrandData # is this the best way to pass integrand data through the functions?
     Tobs::Float64
     Nl::Int
     Nr::Int
@@ -40,9 +43,10 @@ function h(chisq::Float64, N::Int)
         if (i < N)
             weight *= 0.5
         end
-        res += weight * pdf(Chisq(i), chisq) # check that this really does the same as gsl_ran_chisq_pdf(chisq, i) in c++
+        res += weight * pdf(Chisq(i), chisq) 
     end
 
+    # println("resh: ", res)
     return res
 end
 
@@ -57,17 +61,36 @@ function H(a::Float64, b::Float64, N::Int)
         end
         res += weight * (cdf(Chisq(i), b) - cdf(Chisq(i), a))
     end
-
+    # println("resH: ", res)
     return res
 end
 
 
-function integrand(x::Float64)
 
+
+function integrand(x::Float64)
+    # println("reshH: ", h(x, e.Nl) * H(e.Tobs - x, e.Tobs, e.Nr))
     return h(x, e.Nl) * H(e.Tobs - x, e.Tobs, e.Nr)
 end 
 
 
+function Delta(Tobs::Float64, Nl::Int, Nr::Int, epsrel::Float64, epsabs::Float64, maxevals=10^7)
+    
+    # seems inelegant:
+    e.Tobs = Tobs
+    e.Nl = Nl
+    e.Nr = Nr
+
+    return quadgk(integrand, 0, Tobs, epsrel, epsabs, maxevals)
+    
+end
+
+
+
+
+#=
+
+# wonky derivative from c++ version
 function Delta(Tobs::Float64, Nl::Int, Nr::Int, epsrel::Float64, epsabs::Float64)
     limit = 1000
     w = integration_workspace_alloc(limit)
@@ -83,14 +106,15 @@ function Delta(Tobs::Float64, Nl::Int, Nr::Int, epsrel::Float64, epsabs::Float64
     result = 0.0
     abserr = 0.0
 
-    result = integration_qag(F, 0, Tobs, epsabs, epsrel, limit, GSL_INTEG_GAUSS21, w, result, abserr)
+    result_int = integration_qag(F, 0, Tobs, epsabs, epsrel, limit, GSL_INTEG_GAUSS21, w, result, abserr)
 
     integration_workspace_free(w)
-    
-    return result 
+    println("res_int: ", result_int)
+    return result_int
 end
 
-#=
+
+
 function cubature_integrand(uv::AbstractArray, Tobs::Float64, Nl::Int, Nr::Int, spline::gsl_spline, acc::gsl_interp_accel) # check if this works instead of passing *fval as an argument as in the c++ code
     
     # d.counter += 1
@@ -181,3 +205,5 @@ function approx_pvalue(Tobs::Float64, N::Int, n::Float64, epsrel::Float64, epsab
 
     return 1 - approx_cumulative(Tobs, N, n, epsrel, epsabs)
 end
+
+#println(approx_pvalue(30.0, 50, 100.0, 0.1, 0.001))
