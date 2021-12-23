@@ -6,7 +6,7 @@
 Template for Julia packages.
 """
 module RunStatistics
-include("Suares.jl")
-include("Partitions.jl")
-include("Tobs.jl")
+include("squares.jl")
+include("partitions.jl")
+include("tobs.jl")
 end # module
