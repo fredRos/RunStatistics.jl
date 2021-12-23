@@ -6,6 +6,7 @@
 # 3 Mean μ and variance σ^2 are known
 
 
+#Hello world
 #Think about implementing a special case with μ and σ as vectors, so each obsevation X[i] can have an individual normal distribution
 
 function tobs(X::AbstractArray, μ::Real, σ2::Real)
