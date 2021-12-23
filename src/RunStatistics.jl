@@ -2,6 +2,7 @@
 
 module RunStatistics
 include("partitions.jl")
+include("squares.jl")
 include("squares_approx.jl")
 include("partitions.jl")
 include("tobs.jl")
