@@ -12,16 +12,14 @@ using QuadGK
 
 # fred often works with pointers to storage locations of values of variables instead of variables themselves. Check how to do that properly here
 
-mutable struct IntegrandData # is this the best way to pass integrand data through the functions?
+mutable struct IntegrandData 
     Tobs::Float64
     Nl::Int
     Nr::Int
 end
 
-e = IntegrandData(1.0, 1, 1)
 
 
-#=
 mutable struct CubaIntegrandData
     Tobs::Float64 # check if needs to be Float64, or something less suffices. also with IntegrandData
     Nl::Int 
@@ -32,7 +30,7 @@ mutable struct CubaIntegrandData
 end
 
 d = CubaIntegrandData(1.0, 1, 1, 0, 0, 0)
-=#
+
 
 function h(chisq::Float64, N::Int)
 
@@ -66,71 +64,36 @@ function H(a::Float64, b::Float64, N::Int)
 end
 
 
-
-
-function integrand(x::Float64)
+function (integrand::IntegrandData)(x::Float64)
     # println("reshH: ", h(x, e.Nl) * H(e.Tobs - x, e.Tobs, e.Nr))
-    return h(x, e.Nl) * H(e.Tobs - x, e.Tobs, e.Nr)
+    return h(x, integrand.Nl) * H(integrand.Tobs - x, integrand.Tobs, integrand.Nr)
 end 
 
 
-function Delta(Tobs::Float64, Nl::Int, Nr::Int, epsrel::Float64, epsabs::Float64, maxevals=10^7)
-    
-    # seems inelegant:
-    e.Tobs = Tobs
-    e.Nl = Nl
-    e.Nr = Nr
+function Delta(Tobs::Float64, Nl::Int, Nr::Int, epsrel::Float64, epsabs::Float64, maxevals=10^3) # thinks about making error args optional
+    # this doesn't support passing on additional parameters to the integrand function :( is this a problem?
+    # could maybe also work with cubature.jl. is it sensible to only use one package?
+    F = IntegrandData(Tobs, Nl, Nr)
 
-    return quadgk(integrand, 0, Tobs, epsrel, epsabs, maxevals)
-    
+    return quadgk(F, 0, Tobs, rtol=epsrel, atol=epsabs, maxevals=maxevals, order=10)  # maybe delete F afterwards?
 end
-
-
-
 
 #=
 
-# wonky derivative from c++ version
-function Delta(Tobs::Float64, Nl::Int, Nr::Int, epsrel::Float64, epsabs::Float64)
-    limit = 1000
-    w = integration_workspace_alloc(limit)
-
-    # seems inelegant:
-    e.Tobs = Tobs
-    e.Nl = Nl
-    e.Nr = Nr
-    
-
-    F = @gsl_function(integrand) 
-
-    result = 0.0
-    abserr = 0.0
-
-    result_int = integration_qag(F, 0, Tobs, epsabs, epsrel, limit, GSL_INTEG_GAUSS21, w, result, abserr)
-
-    integration_workspace_free(w)
-    println("res_int: ", result_int)
-    return result_int
-end
-
-
-
-function cubature_integrand(uv::AbstractArray, Tobs::Float64, Nl::Int, Nr::Int, spline::gsl_spline, acc::gsl_interp_accel) # check if this works instead of passing *fval as an argument as in the c++ code
-    
-    # d.counter += 1
+function (c_int::CubaIntegrandData)(uv::AbstractArray) # analog to cubature_integrand in fred's code. investigate the storage pointers he uses 
+    c_int.counter += 1 
 
     u = uv[1]
     v = uv[2]
-    x = Tobs * u * (1 - v) + Tobs * (1 - u)
-    y = Tobs * u * v + Tobs * (1 - u)
-    jac = Tobs * Tobs * u
+    x = c_int.Tobs * u * (1 - v) + c_int.Tobs * (1 - u)
+    y = c_int.Tobs * u * v + c_int.Tobs * (1 - u)
+    jac = c_int.Tobs * c_int.Tobs * u
 
-    fval = jac * h(x, Nl) * h(y, Nr)
-    fval *= (spline && acc) ? spline_eval(spline, x + y, acc) : cumulative(Tobs, Nl + Nr)
+    fval = jac * h(x, c_int.Nl) * h(y, c_int.Nr)
+    fval *= (c_int.spline && c_int.acc) ? spline_eval(c_int.spline, x + y, c_int.acc) : cumulative(c_int.Tobs, c_int.Nl + c_int.Nr)
 
     return fval
 end 
-
 
 
 function full_correction(Tobs::Float64, Nl::Int, Nr::Int, epsrel::Float64, epsabs::Float64, ninterp::Int) # what is this even exactly supposed to do??
@@ -188,16 +151,15 @@ function full_correction(Tobs::Float64, Nl::Int, Nr::Int, epsrel::Float64, epsab
     return res
 
 end
-
 =#
 
 
-
+# find sensible default values for epsrel and epsabs.
 
 function approx_cumulative(Tobs::Float64, N::Int, n::Float64, epsrel::Float64, epsabs::Float64)
 
     F = cumulative(Tobs, N)
-    Fn1 = (F / (1 + Delta(Tobs, N, N, epsrel, epsabs))) ^ (n - 1)
+    Fn1 = (F / (1 + Delta(Tobs, N, N, epsrel, epsabs)[1])) ^ (n - 1)
     return F * Fn1
 end
 
