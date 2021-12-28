@@ -19,7 +19,6 @@ This code is based on the [original implementation](https://github.com/fredRos/r
 
 
 ## Installation
--------
 
 To install RunStatistics.jl, start Julia and run 
 
@@ -29,18 +28,16 @@ julia> pkg"add RunStatistics"
 ```
 
 ## SQUARES statistic
--------
 
 When calculating the p value P(T >= Tobs | N) for a sequence of `N` observations, first the value of the SQUARES test statistic `Tobs` needs to be calculated. It denotes the largest $\chi^2$ of any run of consecutive successes (above expectation) in a sequence of `N` independent trials with Gaussian uncertainty
 
 For the Squares statistic to be calculable, the observed data must satisfy following conditions:
 
-> 1. All observations {$\sf{X_{i}}$} are independent. 
-> 2. Each observation is normally distributed, Xi ∼ N( $\sf{µ_{i}}$
-, $\sf{σ^2_{i}}$ ). 
-> 3. Mean $\sf{µ_{i}}$ and variance $\sf{σ^2_{i}}$ are known.
+> 1. All observations {X_i} are independent. 
+> 2. Each observation is normally distributed, Xi ∼ N( µ_i, σ^2_i ). 
+> 3. Mean µ_i and variance σ^2_i are known.
 
-Calculating `Tobs` for the observed data {$\sf{X_{i}}$} is done with the `tobs()` function:
+Calculating `Tobs` for the observed data X_i is done with the `tobs()` function:
 
 ```Julia
 Tobs = tobs(X::AbstractArray, μ::Real, σ2::Real)
@@ -65,7 +62,6 @@ julia> pvalue(Tobs::Float64, N::Int)
 ```
 
 ### Approximation for large N
--------
 
 For large `N`, the number of therms in the exact expression scales like `exp(N^1/2)/N` and quickly grows too large. An approximate formula is implemented here for `n*N`, where the cumulative for example `N = 100` is computed exactly and `n` may be 1 or >> `N` and need not even be an integer. 
 
