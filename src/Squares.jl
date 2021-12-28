@@ -9,7 +9,6 @@ using Distributions
 
 log_factorial = []
 
-
 function CacheFactorials(N)
     if N < length(log_factorial)
         return length(log_factorial)
@@ -28,20 +27,14 @@ function CacheFactorials(N)
     return length(log_factorial)
 end
 
-
-
-
-
 function CacheChi2(Tobs::Float64, N::Int)
     
-    # @argcheck 0 < N
+    @argcheck 0 < N
 
     res = zeros(N + 1)
     res[1] = NaN # ? does this fulfill the intended purpose?
 
-    #create team of threads somehow?
-
-    for i in range(2, N + 1)
+    Threads.@threads for i in range(2, N + 1)
         res[i] = logcdf(Chisq(i - 1), Tobs)
     end
 
@@ -49,8 +42,22 @@ function CacheChi2(Tobs::Float64, N::Int)
 end
 
 
+"""
+    cumulative(Tobs::Float64, N::Int)
 
+Compute the cumulative distribution of the weighted-runs, or SQUARES, statistic `T`.
 
+`Tobs` is the value of the test statistic for the observed data set; i.e., the largest \chi^2 of 
+any run of consecutive observed values above the expectation. `N` is the total number of data points.
+
+The calculation implements Eqns. (16) and (17) from
+
+Frederik Beaujean and Allen Caldwell. “A Test Statistic for
+Weighted Runs.” Journal of Statistical Planning and Inference 141,
+no. 11 (November 2011): 3437–46. doi:10.1016/j.jspi.2011.04.022
+http://arxiv.org/abs/1005.3233.
+
+"""
 function cumulative(Tobs::Float64, N::Int)
     
     CacheFactorials(N)
@@ -63,9 +70,7 @@ function cumulative(Tobs::Float64, N::Int)
 
     p = 0.0
 
-    #again create team of threads
-
-    for r in range(1, N)
+    Threads.@threads for r in range(1, N)
         Mmax = min(r, N - r + 1)
         poch = 0
 
@@ -78,7 +83,7 @@ function cumulative(Tobs::Float64, N::Int)
             n = g.c
             y = g.y
 
-            check = true # to assure that the initial partition is also counted 
+            check = true
             while check
                 h = g.h
 
@@ -96,12 +101,18 @@ function cumulative(Tobs::Float64, N::Int)
         end
     end
 
-    # assert p<1
+    @assert p < 1
     return p
 end
 
 # println(cumulative(3.4, 10), " ", cumulative(6.5, 20), " ", cumulative(9.0, 6), " ", cumulative(5.4, 4), " ", cumulative(3.9, 11)) 
+"""
+    pvalue(Tobs::Float64, N::Int)
 
+Compute the p value P(T >= `Tobs` | `N`) with `Tobs` being the value of the squares test statistic,
+i.e. the larges chi^2 of any run of consecutive successes (above expectation) in a sequence of `N` 
+independent trials with Gaussian uncertainty.
+"""
 function pvalue(Tobs::Float64, N::Int)
     return 1 - cumulative(Tobs, N)    
 end

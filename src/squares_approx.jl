@@ -6,7 +6,7 @@ using Distributions
 #using StaticArrays
 using QuadGK
 
-#include("squares.jl")
+# include("squares.jl")
 
 # in many cases the Float64s here could probably be of a smaller type e.g. Float34 or something. check if it  makes a difference
 
@@ -19,7 +19,7 @@ mutable struct IntegrandData
 end
 
 
-
+#=
 mutable struct CubaIntegrandData
     Tobs::Float64 # check if needs to be Float64, or something less suffices. also with IntegrandData
     Nl::Int 
@@ -30,10 +30,9 @@ mutable struct CubaIntegrandData
 end
 
 d = CubaIntegrandData(1.0, 1, 1, 0, 0, 0)
-
+=#
 
 function h(chisq::Float64, N::Int)
-
     res = 0
     weight = 0.5
 
@@ -44,7 +43,6 @@ function h(chisq::Float64, N::Int)
         res += weight * pdf(Chisq(i), chisq) 
     end
 
-    # println("resh: ", res)
     return res
 end
 
@@ -59,18 +57,17 @@ function H(a::Float64, b::Float64, N::Int)
         end
         res += weight * (cdf(Chisq(i), b) - cdf(Chisq(i), a))
     end
-    # println("resH: ", res)
+    
     return res
 end
 
 
 function (integrand::IntegrandData)(x::Float64)
-    # println("reshH: ", h(x, e.Nl) * H(e.Tobs - x, e.Tobs, e.Nr))
     return h(x, integrand.Nl) * H(integrand.Tobs - x, integrand.Tobs, integrand.Nr)
 end 
 
 
-function Delta(Tobs::Float64, Nl::Int, Nr::Int, epsrel::Float64, epsabs::Float64, maxevals=10^3) # thinks about making error args optional
+function Delta(Tobs::Float64, Nl::Int, Nr::Int, epsrel::Float64, epsabs::Float64, maxevals=10^3) # think about making error args optional
     # this doesn't support passing on additional parameters to the integrand function :( is this a problem?
     # could maybe also work with cubature.jl. is it sensible to only use one package?
     F = IntegrandData(Tobs, Nl, Nr)
@@ -168,4 +165,4 @@ function approx_pvalue(Tobs::Float64, N::Int, n::Float64, epsrel::Float64, epsab
     return 1 - approx_cumulative(Tobs, N, n, epsrel, epsabs)
 end
 
-#println(approx_pvalue(30.0, 50, 100.0, 0.1, 0.001))
+println(approx_cumulative(30.0, 50, 100.0, 0.1, 0.001))
