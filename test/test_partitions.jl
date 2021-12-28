@@ -38,6 +38,6 @@ should therefore yield:
 1*1 + 1*2 + 1*3
 3*2
 
-as the partitions
+as the partitions (note that the actual output of the function first has to be interpreted correctly, see docstring)
 
 =#
