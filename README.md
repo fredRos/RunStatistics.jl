@@ -19,7 +19,6 @@ This code is based on the [original implementation](https://github.com/fredRos/r
 
 
 ## Installation
--------
 
 To install RunStatistics.jl, start Julia and run 
 
@@ -29,7 +28,6 @@ julia> pkg"add RunStatistics"
 ```
 
 ## SQUARES statistic
--------
 
 When calculating the p value P(T >= Tobs | N) for a sequence of `N` observations, first the value of the SQUARES test statistic `Tobs` needs to be calculated. It denotes the largest $\chi^2$ of any run of consecutive successes (above expectation) in a sequence of `N` independent trials with Gaussian uncertainty
 
@@ -64,7 +62,6 @@ julia> pvalue(Tobs::Float64, N::Int)
 ```
 
 ### Approximation for large N
--------
 
 For large `N`, the number of therms in the exact expression scales like `exp(N^1/2)/N` and quickly grows too large. An approximate formula is implemented here for `n*N`, where the cumulative for example `N = 100` is computed exactly and `n` may be 1 or >> `N` and need not even be an integer. 
 
