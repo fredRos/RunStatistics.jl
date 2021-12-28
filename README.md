@@ -35,12 +35,11 @@ When calculating the p value P(T >= Tobs | N) for a sequence of `N` observations
 
 For the Squares statistic to be calculable, the observed data must satisfy following conditions:
 
-> 1. All observations {$\sf{X_{i}}$} are independent. 
-> 2. Each observation is normally distributed, Xi ∼ N( $\sf{µ_{i}}$
-, $\sf{σ^2_{i}}$ ). 
-> 3. Mean $\sf{µ_{i}}$ and variance $\sf{σ^2_{i}}$ are known.
+> 1. All observations {X_i} are independent. 
+> 2. Each observation is normally distributed, Xi ∼ N( µ_i, σ^2_i ). 
+> 3. Mean µ_i and variance σ^2_i are known.
 
-Calculating `Tobs` for the observed data {$\sf{X_{i}}$} is done with the `tobs()` function:
+Calculating `Tobs` for the observed data X_i is done with the `tobs()` function:
 
 ```Julia
 Tobs = tobs(X::AbstractArray, μ::Real, σ2::Real)
