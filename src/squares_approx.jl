@@ -165,4 +165,3 @@ function approx_pvalue(Tobs::Float64, N::Int, n::Float64, epsrel::Float64, epsab
     return 1 - approx_cumulative(Tobs, N, n, epsrel, epsabs)
 end
 
-println(approx_cumulative(30.0, 50, 100.0, 0.1, 0.001))
