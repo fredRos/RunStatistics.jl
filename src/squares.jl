@@ -47,7 +47,7 @@ end
 
 Compute the cumulative distribution of the weighted-runs, or SQUARES, statistic `T`.
 
-`Tobs` is the value of the test statistic for the observed data set; i.e., the largest \chi^2 of 
+`Tobs` is the value of the test statistic for the observed data set; i.e., the largest chi^2 of 
 any run of consecutive observed values above the expectation. `N` is the total number of data points.
 
 The calculation implements Eqns. (16) and (17) from
