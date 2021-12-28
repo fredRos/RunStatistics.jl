@@ -7,11 +7,11 @@ p = RunStatistics.partition(6, 3)
 
 @testset "partitions" begin
 
-    for i in range(0, 2)
+    for i in range(0, 2; step = 1)
 
         sum = 0
 
-        for j in range(2, p.h + 1)
+        for j in range(2, p.h + 1; step = 1)
                
             sum += p.c[j] * p.y[j]
         end
