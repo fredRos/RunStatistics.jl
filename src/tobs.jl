@@ -11,8 +11,7 @@
 function tobs(X::AbstractArray, μ::Real, σ2::Real)
     χ2 = []
     χi = 0
-
-    for i in range(1, length(X))
+    for i in range(1, length(X); step = 1)
         X[i] > μ ?  χi += (X[i] - μ)^2 / σ2 : (append!(χ2, χi); χi = 0)
     end 
     
