@@ -76,10 +76,10 @@ Tobs = tobs(X::AbstractArray, μ::Real, σ2::Real)
 
 Where `X` is a vector containing the observations, and `μ` and `σ2` are their mean and variance.
 
-If the ovservations don't all have the same mean and variance, use `tobs_ind()`:
+If the ovservations don't all have the same mean and variance, use:
 
 ```Julia
-Tobs = tobs_ind(X::AbstractArray, μ::AbstractArray, σ2::AbstractArray)
+Tobs = tobs(X::AbstractArray, μ::AbstractArray, σ2::AbstractArray)
 ```
 
 with the i-th elements of `μ` and `σ2` are the mean and variance of the i-th element of `X`.
@@ -99,12 +99,12 @@ For large `N`, the number of therms in the exact expression scales like `exp(N^1
 The cumulative distribution P(T < Tobs | n\*N) and the p value P(T >= Tobs | n\*N) are approximated by:
 
 ```Julia 
-julia> approx_cumulative(Tobs::Float64, N::Int, n::Float64, epsrel::Float64, epsabs::Float64)
+julia> approx_cumulative(Tobs::Float64, N::Int, n::Float64, [epsrel::Float64, epsabs::Float64])
 
-julia> approx_pvalue(Tobs::Float64, N::Int, n::Float64, epsrel::Float64, epsabs::Float64)
+julia> approx_pvalue(Tobs::Float64, N::Int, n::Float64, [epsrel::Float64, epsabs::Float64])
 ```
 
-The approximation involves a 1D numerical integration whose relative and absolute target precision are `epsrel` and `epsabs`. 
+The approximation involves a 1D numerical integration whose relative and absolute target precision are `epsrel` and `epsabs`; these are optional arguments in the above functions. 
 ## Documentation
 
 * [Documentation for stable version](https://bat.github.io/RunStatistics.jl/stable)
