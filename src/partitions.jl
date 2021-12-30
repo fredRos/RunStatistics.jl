@@ -1,13 +1,14 @@
 # This file is a part of RunStatistics.jl, licensed under the MIT License (MIT).
 
+
 """
     Partition(c::Vector{Int}, y::Vector{Int}, n::Int, h::Int, done::Bool)
 
-Represent the integer partition of `n` into `k` parts, with n = \\sum_{i=1}^h c_i * y_i;  `h` is the number of distinct parts, `y` the parts and `c` their multiplicities.
+Represent the integer partition of `n` into `k` parts, with n = \\sum_{i=1}^h c_i * y_i; `h` is the number of distinct parts, `y` the parts and `c` their multiplicities.
 
-Important: when reading ignore first element of `c` and `y` and do not read beyond `c[h + 1]`, `y[h + 1]`.
+When reading: ignore first element of `c` and `y` and do not read beyond `c[h + 1]`, `y[h + 1]`.
 """
-mutable struct Partition # could apparently be an issue with performance because of redifining the partition attributes in the process of updating the partition in place
+mutable struct Partition 
     c::Vector{Int}
     y::Vector{Int}
     n::Int
@@ -16,13 +17,12 @@ mutable struct Partition # could apparently be an issue with performance because
 end
 
 
-
 """
     partition(n::Int, k::Int)
 
 Initiate the first partition of an integer `n` into `k` parts, arguments must satisfy `0 < k <= n`. 
 
-Returns an object of type `Partition`. The vecors `c` and `y` have buffer values at index 1.
+Returns an object of type `Partition`
 """
 function partition(n::Int, k::Int)
 
@@ -51,14 +51,14 @@ function partition(n::Int, k::Int)
         done = false 
     end
 
+     
     return Partition(c, y, n, h, done)
 end 
-
 
 """
     iterate!(p::partition)
 
-Compute the next partition of `p`, updating it in place; returns an object of type `Partition`. 
+Compute the next partition of `p`, updating it in place. Returns an object of type `partition`. 
 """
 function iterate!(p::Partition)
 
@@ -101,6 +101,7 @@ function iterate!(p::Partition)
         if (r == y[i])
             c[i] += 1
             h = i - 1
+
         else
             y[h + 1] = r
             c[h+ 1] = 1
@@ -109,10 +110,10 @@ function iterate!(p::Partition)
         p.c = c
         p.y = y
         p.h = h
-
         return p 
     end
 end
+
 
 """
     final_partition(p::partition)
@@ -122,3 +123,46 @@ Check whether `p` is the final partition. Returns a `boolean`.
 function final_partition(p::Partition)
     return p.y[p.h + 1] - p.y[2] <= 1 
 end 
+
+
+
+
+
+
+#=
+struct AbstractPartitionGenerator
+
+    function bool(p::AbstractPartitionGenerator)
+        return !p.done
+    end
+
+    # some stuff again with adresses
+    AbstractPartitionGenerator(p::Partition)
+
+    function final_partition(p::partition)
+        return p.y[p.h + 1] - p.y[2] <= 1 
+    end
+    
+    
+    # might be a problem, is 'virtual bool' in c++
+    done::Bool
+    p::typeof(p) # does this make sense?
+end
+
+
+
+struct PartitionsGenerator <: AbstractPartitionGenerator
+    PartitionsGenerator(n::Int, k::Int)
+
+    operator++()::PartitionsGenerator
+     # problem with final_partition() in parent, how does the override work in julia?
+
+
+end
+
+
+function PartitionGenerator.final_partition()
+    return
+end
+
+=#

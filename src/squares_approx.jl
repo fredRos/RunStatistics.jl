@@ -1,16 +1,17 @@
 # This file is a part of RunStatistics.jl, licensed under the MIT License (MIT).
 
 using Distributions
-#using GSL
-#using HCubature
-#using StaticArrays
 using QuadGK
 
-# include("squares.jl")
+#include("squares.jl")
 
 # in many cases the Float64s here could probably be of a smaller type e.g. Float34 or something. check if it  makes a difference
 
-# fred often works with pointers to storage locations of values of variables instead of variables themselves. Check how to do that properly here
+
+# is this a good way to implement methods with different argument types?
+
+T = Union{Int, Float64}
+U = Union{Float64, Nothing}
 
 mutable struct IntegrandData 
     Tobs::Float64
@@ -67,12 +68,12 @@ function (integrand::IntegrandData)(x::Float64)
 end 
 
 
-function Delta(Tobs::Float64, Nl::Int, Nr::Int, epsrel::Float64, epsabs::Float64, maxevals=10^3) # think about making error args optional
+function Delta(Tobs::T, Nl::Int, Nr::Int, epsrel::U, epsabs::U)
     # this doesn't support passing on additional parameters to the integrand function :( is this a problem?
     # could maybe also work with cubature.jl. is it sensible to only use one package?
     F = IntegrandData(Tobs, Nl, Nr)
 
-    return quadgk(F, 0, Tobs, rtol=epsrel, atol=epsabs, maxevals=maxevals, order=10)  # maybe delete F afterwards?
+    return quadgk(F, 0, Tobs, rtol=epsrel, atol=epsabs, order=10)
 end
 
 #=
@@ -151,17 +152,19 @@ end
 =#
 
 
-# find sensible default values for epsrel and epsabs.
 
-function approx_cumulative(Tobs::Float64, N::Int, n::Float64, epsrel::Float64, epsabs::Float64)
+function approx_cumulative(Tobs::T, N::Int, n::T, epsrel::U=nothing, epsabs::U=nothing) 
 
     F = cumulative(Tobs, N)
     Fn1 = (F / (1 + Delta(Tobs, N, N, epsrel, epsabs)[1])) ^ (n - 1)
     return F * Fn1
 end
 
-function approx_pvalue(Tobs::Float64, N::Int, n::Float64, epsrel::Float64, epsabs::Float64)
+
+
+function approx_pvalue(Tobs::T, N::Int, n::T, epsrel::U= nothing, epsabs::U=nothing)
 
     return 1 - approx_cumulative(Tobs, N, n, epsrel, epsabs)
 end
 
+#println(approx_cumulative(30, 50, 100))

@@ -5,11 +5,13 @@ using ArgCheck
 using Distributions
 
 
-# include("partitions.jl")
+#include("partitions.jl")
 
-log_factorial = []
+log_factorial = Vector{Float64}(undef, 0)
 
-function CacheFactorials(N)
+T = Union{Int, Float64}
+
+function cachefactorials(N::Int)
     if N < length(log_factorial)
         return length(log_factorial)
     end
@@ -27,15 +29,17 @@ function CacheFactorials(N)
     return length(log_factorial)
 end
 
-function CacheChi2(Tobs::Float64, N::Int)
+
+function cachechi2(Tobs::T, N::Int)
     
     @argcheck 0 < N
 
     res = zeros(N + 1)
-    res[1] = NaN # ? does this fulfill the intended purpose?
+    res[1] = NaN 
 
+    #TODO: List comprehension
     Threads.@threads for i in range(2, N + 1)
-        res[i] = logcdf(Chisq(i - 1), Tobs)
+        res[i] = logcdf(Chisq(i - 1), Tobs) 
     end
 
     return res
@@ -58,27 +62,31 @@ no. 11 (November 2011): 3437–46. doi:10.1016/j.jspi.2011.04.022
 http://arxiv.org/abs/1005.3233.
 
 """
-function cumulative(Tobs::Float64, N::Int)
+function cumulative(Tobs::T, N::Int)
     
-    CacheFactorials(N)
+    cachefactorials(N)
 
-    log_cumulative = CacheChi2(Tobs, N)
+    log_cumulative = cachechi2(Tobs, N)
 
     poch = 0.0
 
     logpow2N1 = (N <= 63) ? log((1 << N) - 1) : N * log(2) 
 
-    p = 0.0
+    p = Threads.Atomic{Float64}(0.0)
 
+    
     Threads.@threads for r in range(1, N)
+
         Mmax = min(r, N - r + 1)
-        poch = 0
+        poch = 0.0
 
         for M in range(1, Mmax)
             poch += log(N - r + 2 - M)
             scale = poch - logpow2N1
             ppi = 0.0
+            
 
+            # works differntly to c++ code, think about if this is alright
             g = partition(r, M)
             n = g.c
             y = g.y
@@ -87,23 +95,26 @@ function cumulative(Tobs::Float64, N::Int)
             while check
                 h = g.h
 
-                ppartition = 0
+                ppartition = 0.0
                 for l in range(2, h + 1)
                     ppartition += n[l] * log_cumulative[y[l] + 1] - log_factorial[n[l] + 1]
                 end 
                 ppi += exp(ppartition)
                 
-                check = !final_partition(g)
+                #Note does this make sense? "equivalent to check = final_partition()"
+                check = (g.y[g.h + 1] - g.y[2] > 1)
                 iterate!(g)
             end
 
-            p += exp(scale + log(ppi))
+            p[] += exp(scale + log(ppi))
         end
     end
 
-    @assert p < 1
-    return p
+    @assert p[] < 1
+    return p[]
 end
+
+#println(cumulative(12.3, 50))
 
 # println(cumulative(3.4, 10), " ", cumulative(6.5, 20), " ", cumulative(9.0, 6), " ", cumulative(5.4, 4), " ", cumulative(3.9, 11)) 
 """
@@ -113,7 +124,7 @@ Compute the p value P(T >= `Tobs` | `N`) with `Tobs` being the value of the squa
 i.e. the larges chi^2 of any run of consecutive successes (above expectation) in a sequence of `N` 
 independent trials with Gaussian uncertainty.
 """
-function pvalue(Tobs::Float64, N::Int)
+function pvalue(Tobs::T, N::Int)
     return 1 - cumulative(Tobs, N)    
 end
 

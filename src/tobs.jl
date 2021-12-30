@@ -1,17 +1,21 @@
 # This file is a part of RunStatistics.jl, licensed under the MIT License (MIT).
 
-# Calculates the Test statistic T = max_j χ^2_{run,j} for a sequence of observations that fulfill the assumptions:
-# 1 All observations are independent
-# 2 Each observation is normally distributed
-# 3 Mean μ and variance σ^2 are known
 
+"""
+    tobs(X::AbstractArray, μ::Float64, σ2::Float64)
 
-#Think about implementing a special case with μ and σ as vectors, so each obsevation X[i] can have an individual normal distribution
+Cumpute the value of the squares test statistic `Tobs` i.e. the largest \\chi^2 of any run of consecutive successes (above expectation)
+in a sequence of `N` independent trials with Gaussian uncertainty. With μ and σ2 being the expectation and variance of the observations.
 
+For the Squares statistic to be calculable, the observed data must satisfy following conditions:
+
+        All observations {X_i} are independent.
+        Each observation is normally distributed, Xi ∼ N( µ_i, σ^2_i ).
+        Mean µ_i and variance σ^2_i are known.
+"""
 function tobs(X::AbstractArray, μ::Real, σ2::Real)
     χ2 = []
     χi = 0
-
     for i in range(1, length(X); step = 1)
         X[i] > μ ?  χi += (X[i] - μ)^2 / σ2 : (append!(χ2, χi); χi = 0)
     end 
@@ -19,7 +23,7 @@ function tobs(X::AbstractArray, μ::Real, σ2::Real)
     return maximum(χ2)
 end
 
-function tobs_ind(X::AbstractArray, μ::AbstractArray, σ2::AbstractArray)
+function tobs(X::AbstractArray, μ::AbstractArray, σ2::AbstractArray)
     χ2 = []
     χi = 0
 
@@ -30,26 +34,3 @@ function tobs_ind(X::AbstractArray, μ::AbstractArray, σ2::AbstractArray)
     return maximum(χ2)
 end
 
-
-#=
-
-example of docstring? 
-
-"""
-    RunStatistics.hello_world()
-
-Prints "Hello, World!" and returns 42.
-
-```jldoctest
-using RunStatistics
-
-RunStatistics.hello_world()
-
-# output
-
-Hello, World!
-42
-```
-"""
-
-=#
