@@ -13,7 +13,7 @@ For the Squares statistic to be calculable, the observed data must satisfy follo
         Each observation is normally distributed, Xi ∼ N( µ_i, σ^2_i ).
         Mean µ_i and variance σ^2_i are known.
 """
-function tobs(X::AbstractArray, μ::Float64, σ2::Float64)
+function tobs(X::AbstractArray, μ::Real, σ2::Real)
     χ2 = []
     χi = 0
     for i in range(1, length(X); step = 1)
