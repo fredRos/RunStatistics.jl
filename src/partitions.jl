@@ -1,6 +1,5 @@
 # This file is a part of RunStatistics.jl, licensed under the MIT License (MIT).
 
-
 """
     Partition(c::Vector{Int}, y::Vector{Int}, n::Int, h::Int, done::Bool)
 
@@ -8,7 +7,6 @@ Represent the integer partition of `n` into `k` parts, with n = \\sum_{i=1}^h c_
 
 When reading: ignore first element of `c` and `y` and do not read beyond `c[h + 1]`, `y[h + 1]`.
 """
-
 mutable struct Partition
     c::Vector{Int}
     y::Vector{Int}

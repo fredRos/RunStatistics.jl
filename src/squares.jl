@@ -1,11 +1,8 @@
 # This file is a part of RunStatistics.jl, licensed under the MIT License (MIT).
 
-using ArgCheck
-using Distributions
-
+export pvalue, cumulative
 
 log_factorial = Vector{Float64}(undef, 0)
-
 T = Union{Int,Float64}
 
 function cachefactorials(N::Int)
@@ -111,16 +108,15 @@ function cumulative(Tobs::T, N::Int)
     return p[]
 end
 
-#println(cumulative(12.3, 50))
-
-# println(cumulative(3.4, 10), " ", cumulative(6.5, 20), " ", cumulative(9.0, 6), " ", cumulative(5.4, 4), " ", cumulative(3.9, 11)) 
 """
     pvalue(Tobs::Float64, N::Int)
 
-Compute the p value P(T >= `Tobs` | `N`) with `Tobs` being the value of the squares test statistic,
-i.e. the larges chi^2 of any run of consecutive successes (above expectation) in a sequence of `N` 
-independent trials with Gaussian uncertainty.
+    Compute the p value P(T >= `Tobs` | `N`) with `Tobs` being the value of the squares test statistic,
+    i.e. the larges chi^2 of any run of consecutive successes (above expectation) in a sequence of `N` 
+    independent trials with Gaussian uncertainty.
 """
 function pvalue(Tobs::T, N::Int)
+
     return 1 - cumulative(Tobs, N)
+
 end

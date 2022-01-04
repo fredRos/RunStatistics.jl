@@ -1,19 +1,14 @@
 # This file is a part of RunStatistics.jl, licensed under the MIT License (MIT).
 
-using Distributions
-using QuadGK
+export approx_cumulative, approx_pvalue
 
-#include("squares.jl")
+#NOTE: in many cases the Float64s here could probably be of a smaller type e.g. Float34 or something. check if it  makes a difference
+#NOTE: is this a good way to implement methods with different argument types?
 
-# in many cases the Float64s here could probably be of a smaller type e.g. Float34 or something. check if it  makes a difference
+T = Union{Int,Float64}
+U = Union{Float64,Nothing}
 
-
-# is this a good way to implement methods with different argument types?
-
-T = Union{Int, Float64}
-U = Union{Float64, Nothing}
-
-mutable struct IntegrandData 
+mutable struct IntegrandData
     Tobs::Float64
     Nl::Int
     Nr::Int
@@ -41,7 +36,7 @@ function h(chisq::Float64, N::Int)
         if (i < N)
             weight *= 0.5
         end
-        res += weight * pdf(Chisq(i), chisq) 
+        res += weight * pdf(Chisq(i), chisq)
     end
 
     return res
@@ -51,21 +46,21 @@ end
 function H(a::Float64, b::Float64, N::Int)
     res = 0
     weight = 0.5
-    
+
     for i in range(1, N)
         if (i < N)
             weight *= 0.5
         end
         res += weight * (cdf(Chisq(i), b) - cdf(Chisq(i), a))
     end
-    
+
     return res
 end
 
 
 function (integrand::IntegrandData)(x::Float64)
     return h(x, integrand.Nl) * H(integrand.Tobs - x, integrand.Tobs, integrand.Nr)
-end 
+end
 
 
 function Delta(Tobs::T, Nl::Int, Nr::Int, epsrel::U, epsabs::U)
@@ -73,7 +68,7 @@ function Delta(Tobs::T, Nl::Int, Nr::Int, epsrel::U, epsabs::U)
     # could maybe also work with cubature.jl. is it sensible to only use one package?
     F = IntegrandData(Tobs, Nl, Nr)
 
-    return quadgk(F, 0, Tobs, rtol=epsrel, atol=epsabs, order=10)
+    return quadgk(F, 0, Tobs, rtol = epsrel, atol = epsabs, order = 10)
 end
 
 #=
@@ -95,12 +90,12 @@ end
 
 
 function full_correction(Tobs::Float64, Nl::Int, Nr::Int, epsrel::Float64, epsabs::Float64, ninterp::Int) # what is this even exactly supposed to do??
-    
+
 
     #wonky at best
 
     data = CubaIntegrandData(Tobs, Nl, Nr, 0)
-    
+
     #find out how to emulate the stuff with null pointers in the c++ code
 
 
@@ -115,7 +110,7 @@ function full_correction(Tobs::Float64, Nl::Int, Nr::Int, epsrel::Float64, epsab
             x[i] = Tobs + i * Tobs / (ninterp - 1)
             y[i] = cumulative(x[i], Nl + Nr)
         end
-    
+
         spline_init(spline, x, y, ninterp)
     end
 
@@ -142,10 +137,10 @@ function full_correction(Tobs::Float64, Nl::Int, Nr::Int, epsrel::Float64, epsab
 
     spline_free(spline)
     interp_accel_free(acc)
-    
+
     x = []
     y = [] # decide if this is enough, or x,y should somehow be deleted as in the c++ code
-    
+
     return res
 
 end
@@ -153,18 +148,16 @@ end
 
 
 
-function approx_cumulative(Tobs::T, N::Int, n::T, epsrel::U=nothing, epsabs::U=nothing) 
+function approx_cumulative(Tobs::T, N::Int, n::T, epsrel::U = nothing, epsabs::U = nothing)
 
     F = cumulative(Tobs, N)
-    Fn1 = (F / (1 + Delta(Tobs, N, N, epsrel, epsabs)[1])) ^ (n - 1)
+    Fn1 = (F / (1 + Delta(Tobs, N, N, epsrel, epsabs)[1]))^(n - 1)
     return F * Fn1
 end
 
 
 
-function approx_pvalue(Tobs::T, N::Int, n::T, epsrel::U= nothing, epsabs::U=nothing)
+function approx_pvalue(Tobs::T, N::Int, n::T, epsrel::U = nothing, epsabs::U = nothing)
 
     return 1 - approx_cumulative(Tobs, N, n, epsrel, epsabs)
 end
-
-#println(approx_cumulative(30, 50, 100))
