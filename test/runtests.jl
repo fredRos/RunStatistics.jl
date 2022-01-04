@@ -1,10 +1,10 @@
 # This file is a part of RunStatistics.jl, licensed under the MIT License (MIT).
 
-import Test
+using Test
 import RunStatistics
 import Documenter
 
-Test.@testset "Package RunStatistics" begin
+@testset "Package RunStatistics" begin
     include("test_partitions.jl")
     include("test_tobs.jl")
     include("test_squares.jl")
@@ -13,7 +13,7 @@ Test.@testset "Package RunStatistics" begin
         RunStatistics,
         :DocTestSetup,
         :(using RunStatistics);
-        recursive=true,
+        recursive = true
     )
     Documenter.doctest(RunStatistics)
 end # testset

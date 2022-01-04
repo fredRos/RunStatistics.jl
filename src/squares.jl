@@ -1,15 +1,12 @@
 # This file is a part of RunStatistics.jl, licensed under the MIT License (MIT).
 
-
 using ArgCheck
 using Distributions
 
 
-#include("partitions.jl")
-
 log_factorial = Vector{Float64}(undef, 0)
 
-T = Union{Int, Float64}
+T = Union{Int,Float64}
 
 function cachefactorials(N::Int)
     if N < length(log_factorial)
@@ -20,7 +17,7 @@ function cachefactorials(N::Int)
 
     if isempty(log_factorial)
         push!(log_factorial, 0.0)
-    end 
+    end
 
     for i in range(length(log_factorial), N)
         push!(log_factorial, last(log_factorial) + log(i))
@@ -31,15 +28,15 @@ end
 
 
 function cachechi2(Tobs::T, N::Int)
-    
+
     @argcheck 0 < N
 
     res = zeros(N + 1)
-    res[1] = NaN 
+    res[1] = NaN
 
     #TODO: List comprehension
     Threads.@threads for i in range(2, N + 1)
-        res[i] = logcdf(Chisq(i - 1), Tobs) 
+        res[i] = logcdf(Chisq(i - 1), Tobs)
     end
 
     return res
@@ -63,18 +60,18 @@ http://arxiv.org/abs/1005.3233.
 
 """
 function cumulative(Tobs::T, N::Int)
-    
+
     cachefactorials(N)
 
     log_cumulative = cachechi2(Tobs, N)
 
     poch = 0.0
 
-    logpow2N1 = (N <= 63) ? log((1 << N) - 1) : N * log(2) 
+    logpow2N1 = (N <= 63) ? log((1 << N) - 1) : N * log(2)
 
     p = Threads.Atomic{Float64}(0.0)
 
-    
+
     Threads.@threads for r in range(1, N)
 
         Mmax = min(r, N - r + 1)
@@ -84,7 +81,7 @@ function cumulative(Tobs::T, N::Int)
             poch += log(N - r + 2 - M)
             scale = poch - logpow2N1
             ppi = 0.0
-            
+
 
             # works differntly to c++ code, think about if this is alright
             g = partition(r, M)
@@ -97,12 +94,12 @@ function cumulative(Tobs::T, N::Int)
 
                 ppartition = 0.0
                 for l in range(2, h + 1)
-                    ppartition += n[l] * log_cumulative[y[l] + 1] - log_factorial[n[l] + 1]
-                end 
+                    ppartition += n[l] * log_cumulative[y[l]+1] - log_factorial[n[l]+1]
+                end
                 ppi += exp(ppartition)
-                
+
                 #Note does this make sense? "equivalent to check = final_partition()"
-                check = (g.y[g.h + 1] - g.y[2] > 1)
+                check = (g.y[g.h+1] - g.y[2] > 1)
                 iterate!(g)
             end
 
@@ -125,6 +122,5 @@ i.e. the larges chi^2 of any run of consecutive successes (above expectation) in
 independent trials with Gaussian uncertainty.
 """
 function pvalue(Tobs::T, N::Int)
-    return 1 - cumulative(Tobs, N)    
+    return 1 - cumulative(Tobs, N)
 end
-
