@@ -64,8 +64,9 @@ end
 
 
 function Delta(Tobs::T, Nl::Int, Nr::Int, epsrel::U, epsabs::U)
-    # this doesn't support passing on additional parameters to the integrand function :( is this a problem?
-    # could maybe also work with cubature.jl. is it sensible to only use one package?
+
+    #NOTE:  this doesn't support passing on additional parameters to the integrand function :( is this a problem?
+    #       could maybe also work with cubature.jl. is it sensible to only use one package?
     F = IntegrandData(Tobs, Nl, Nr)
 
     return quadgk(F, 0, Tobs, rtol = epsrel, atol = epsabs, order = 10)
