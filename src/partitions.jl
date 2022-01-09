@@ -16,7 +16,6 @@ mutable struct Partition
     done::Bool
 end
 
-
 """
     partition(n::Int, k::Int)
 
@@ -113,7 +112,6 @@ function iterate!(p::Partition)
         return p 
     end
 end
-
 
 """
     final_partition(p::partition)

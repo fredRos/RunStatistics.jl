@@ -45,7 +45,7 @@ Tobs = tobs(X::AbstractArray, μ::Real, σ2::Real)
 
 Where `X` is a vector containing the observations, and `μ` and `σ2` are their mean and variance.
 
-If the ovservations don't all have the same mean and variance, use:
+If the obvservations don't all have the same mean and variance, use:
 
 ```Julia
 Tobs = tobs(X::AbstractArray, μ::AbstractArray, σ2::AbstractArray)

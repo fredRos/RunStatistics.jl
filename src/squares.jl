@@ -5,8 +5,6 @@ using ArgCheck
 using Distributions
 
 
-#include("partitions.jl")
-
 log_factorial = Vector{Float64}(undef, 0)
 
 T = Union{Int, Float64}
@@ -44,7 +42,6 @@ function cachechi2(Tobs::T, N::Int)
 
     return res
 end
-
 
 """
     cumulative(Tobs::Float64, N::Int)
@@ -85,7 +82,6 @@ function cumulative(Tobs::T, N::Int)
             scale = poch - logpow2N1
             ppi = 0.0
             
-
             # works differntly to c++ code, think about if this is alright
             g = partition(r, M)
             n = g.c
@@ -114,9 +110,6 @@ function cumulative(Tobs::T, N::Int)
     return p[]
 end
 
-#println(cumulative(12.3, 50))
-
-# println(cumulative(3.4, 10), " ", cumulative(6.5, 20), " ", cumulative(9.0, 6), " ", cumulative(5.4, 4), " ", cumulative(3.9, 11)) 
 """
     pvalue(Tobs::Float64, N::Int)
 
