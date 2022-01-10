@@ -13,9 +13,11 @@ This package implements the cumulative distribution function of the weighted-run
 """
 module RunStatistics
 
-using ArgCheck
+
 using Distributions
 using QuadGK
+using ArgCheck
+using Distributions
 
 
 include("tobs.jl")
