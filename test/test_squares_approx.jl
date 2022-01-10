@@ -12,7 +12,7 @@ epsabs = 0.001
 
 
 @testset "squares_approx" begin
-    @test approx_pvalue(Tobs, N, n, epsrel, epsabs) == 0.241642
-    @test approx_cumulative(Tobs, N, n, epsrel, epsabs) == 0.758358
+    @test approx_pvalue(Tobs, N, n, epsrel, epsabs) ≈ 0.24164150728705625
+    @test approx_cumulative(Tobs, N, n, epsrel, epsabs) ≈ 0.7583584927129438
 end
 
