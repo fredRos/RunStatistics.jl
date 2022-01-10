@@ -72,7 +72,7 @@ function cumulative(Tobs::T, N::Int)
     p = Threads.Atomic{Float64}(0.0)
 
     
-    Threads.@threads for r in range(1, N)
+    Threads.@threads for r in 1:N
 
         Mmax = min(r, N - r + 1)
         poch = 0.0
