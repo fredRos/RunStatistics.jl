@@ -15,7 +15,6 @@ mutable struct Partition
     done::Bool
 end
 
-
 """
     partition(n::Int, k::Int)
 
@@ -42,6 +41,7 @@ function partition(n::Int, k::Int)
         c[2] = n / maxPart
         h = 1
         done = true
+
     else
         y[2] = 1
         c[2] = k - 1
@@ -50,7 +50,6 @@ function partition(n::Int, k::Int)
         h = 2
         done = false
     end
-
 
     return Partition(c, y, n, h, done)
 end

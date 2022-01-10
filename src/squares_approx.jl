@@ -2,8 +2,8 @@
 
 export approx_cumulative, approx_pvalue
 
-#NOTE: in many cases the Float64s here could probably be of a smaller type e.g. Float34 or something. check if it  makes a difference
-#NOTE: is this a good way to implement methods with different argument types?
+# NOTE: in many cases the Float64s here could probably be of a smaller type e.g. Float34 or something. check if it  makes a difference
+# NOTE: is this a good way to implement methods with different argument types?
 
 T = Union{Int,Float64}
 U = Union{Float64,Nothing}
@@ -16,23 +16,28 @@ end
 
 
 #=
+
 mutable struct CubaIntegrandData
+
     Tobs::Float64 # check if needs to be Float64, or something less suffices. also with IntegrandData
     Nl::Int 
     Nr::Int
     counter::Int
     spline::Any
     acc::Any
+
 end
 
 d = CubaIntegrandData(1.0, 1, 1, 0, 0, 0)
+
 =#
 
 function h(chisq::Float64, N::Int)
     res = 0
     weight = 0.5
 
-    for i in range(1, N)
+    for i = 1:N
+        #TODO: why not iterate until (N - 1) and avoid the "if" statement?!
         if (i < N)
             weight *= 0.5
         end
@@ -44,13 +49,16 @@ end
 
 
 function H(a::Float64, b::Float64, N::Int)
+
     res = 0
     weight = 0.5
 
-    for i in range(1, N)
+    for i = 1:N
+        #TODO: why not iterate until (N - 1) and avoid the "if" statement?!
         if (i < N)
             weight *= 0.5
         end
+
         res += weight * (cdf(Chisq(i), b) - cdf(Chisq(i), a))
     end
 
@@ -59,7 +67,7 @@ end
 
 
 function (integrand::IntegrandData)(x::Float64)
-    return h(x, integrand.Nl) * H(integrand.Tobs - x, integrand.Tobs, integrand.Nr)
+    return h(x, integrand.Nl) * H(integrand.Tobs - x, integrand.Tobs, integrand.Nr)  
 end
 
 
@@ -146,7 +154,6 @@ function full_correction(Tobs::Float64, Nl::Int, Nr::Int, epsrel::Float64, epsab
 
 end
 =#
-
 
 
 function approx_cumulative(Tobs::T, N::Int, n::T, epsrel::U = nothing, epsabs::U = nothing)
