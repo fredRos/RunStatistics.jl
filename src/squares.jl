@@ -3,8 +3,7 @@
 
 export pvalue, cumulative
 
-log_factorial = Vector{Float64}(undef, 0)
-T = Union{Int,Float64}
+const log_factorial = Vector{Float64}(undef, 0)
 
 function cachefactorials(N::Int)
     if N < length(log_factorial)
@@ -25,15 +24,16 @@ function cachefactorials(N::Int)
 end
 
 
-function cachechi2(Tobs::T, N::Int)
+function cachechi2(T_obs::Real, N::Int)
 
     @argcheck 0 < N
 
     res = zeros(N + 1)
     res[1] = NaN
 
-    Threads.@threads for i = 2:(N + 1)
-        res[i] = logcdf(Chisq(i - 1), Tobs)
+    for i = firstindex(res)+1:lastindex(res)
+        
+        res[i] = logcdf(Chisq(i - 1), T_obs)
     end
 
     return res
@@ -41,11 +41,11 @@ end
 
 
 """
-    cumulative(Tobs::Float64, N::Int)
+    cumulative(T_obs::Float64, N::Int)
 
 Compute the cumulative distribution of the weighted-runs, or SQUARES, statistic `T`.
 
-`Tobs` is the value of the test statistic for the observed data set; i.e., the largest chi^2 of 
+`T_obs` is the value of the test statistic for the observed data set; i.e., the largest chi^2 of 
 any run of consecutive observed values above the expectation. `N` is the total number of data points.
 
 The calculation implements Eqns. (16) and (17) from Frederik Beaujean and Allen Caldwell. “A Test Statistic for
@@ -54,21 +54,23 @@ no. 11 (November 2011): 3437–46. doi:10.1016/j.jspi.2011.04.022
 http://arxiv.org/abs/1005.3233.
 
 """
-function cumulative(Tobs::T, N::Int)
+function cumulative(T_obs::Real, N::Int)
 
     cachefactorials(N)
 
-    log_cumulative = cachechi2(Tobs, N)
+    log_cumulative = cachechi2(T_obs, N)
 
     #TODO: is this "poch" value necessary since we have one in the for loop.
     poch = 0.0
 
     logpow2N1 = (N <= 63) ? log((1 << N) - 1) : N * log(2)
 
-    p = Threads.Atomic{Float64}(0.0)
+    # p = Threads.Atomic{Float64}(0.0)
+    p = Float64(0)
 
 
-    Threads.@threads for r = 1:N
+    #Threads.@threads 
+    for r = 1:N
 
         Mmax = min(r, N - r + 1)
         poch = 0.0
@@ -101,23 +103,23 @@ function cumulative(Tobs::T, N::Int)
                 iterate!(g)
             end
 
-            p[] += exp(scale + log(ppi))
+            p += exp(scale + log(ppi))
         end
     end
 
-    @assert p[] < 1
-    return p[]
+    @assert p < 1
+    return p
 end
 
 """
-    pvalue(Tobs::Float64, N::Int)
+    pvalue(T_obs::Float64, N::Int)
 
-    Compute the p value P(T >= `Tobs` | `N`) with `Tobs` being the value of the squares test statistic,
+    Compute the p value P(T >= `T_obs` | `N`) with `T_obs` being the value of the squares test statistic,
     i.e. the larges chi^2 of any run of consecutive successes (above expectation) in a sequence of `N` 
     independent trials with Gaussian uncertainty.
 """
-function pvalue(Tobs::T, N::Int)
+function pvalue(T_obs::Real, N::Int)
 
-    return 1 - cumulative(Tobs, N)
+    return 1 - cumulative(T_obs, N)
 
 end

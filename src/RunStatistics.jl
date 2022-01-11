@@ -20,7 +20,7 @@ using ArgCheck
 using Distributions
 
 
-include("tobs.jl")
+include("t_obs.jl")
 include("partitions.jl")
 include("squares.jl")
 include("squares_approx.jl")
