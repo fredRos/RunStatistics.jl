@@ -1,7 +1,7 @@
 # This file is a part of RunStatistics.jl, licensed under the MIT License (MIT).
 
 """
-    Partition(n::Int, k::Int, h::Int, c::Vector{Int}, y::Vector{Int})
+    Partition(c::Vector{Int}, y::Vector{Int}, n::Int, h::Int, done::Bool)
 
 Represent the integer partition of `n` into `k` parts, with n = \\sum_{i=1}^h c_i * y_i; `h` is the number of distinct parts, `y` the parts and `c` their multiplicities.
 
@@ -22,6 +22,7 @@ Initiate the first partition of an integer `n` into `k` parts, arguments must sa
 
 Returns an object of type `Partition`
 """
+
 function Partition(n::Integer, k::Integer)
 
     @argcheck 0 < k <= n

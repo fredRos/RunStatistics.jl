@@ -18,10 +18,10 @@ p = RunStatistics.partition(6, 3)
 
         @test sum == 6
 
-        RunStatistics.iterate!(p)
+        RunStatistics.next_partition!(p)
     end 
     
-    @test RunStatistics.final_partition(p)
+    @test RunStatistics.next_partition!(p)
 
 end
 

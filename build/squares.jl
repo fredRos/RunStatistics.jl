@@ -3,7 +3,7 @@
 
 export pvalue, cumulative
 
-const log_factorial = Vector{Float64}(undef, 0)
+log_factorial = Vector{Float64}(undef, 0)
 
 function cachefactorials(N::Integer)
 
@@ -117,5 +117,3 @@ function pvalue(Tobs::Real, N::Integer)
     return 1 - cumulative(Tobs, N)
 
 end
-
-runs
