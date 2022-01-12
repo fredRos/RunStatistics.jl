@@ -5,21 +5,18 @@ export approx_cumulative, approx_pvalue
 # NOTE: in many cases the Float64s here could probably be of a smaller type e.g. Float34 or something. check if it  makes a difference
 # NOTE: is this a good way to implement methods with different argument types?
 
-T = Union{Int,Float64}
-U = Union{Float64,Nothing}
 
 mutable struct IntegrandData
-    Tobs::Float64
+    T_obs::Float64
     Nl::Int
     Nr::Int
 end
-
 
 #=
 
 mutable struct CubaIntegrandData
 
-    Tobs::Float64 # check if needs to be Float64, or something less suffices. also with IntegrandData
+    T_obs::Real # check if needs to be Real, or something less suffices. also with IntegrandData
     Nl::Int 
     Nr::Int
     counter::Int
@@ -37,7 +34,6 @@ function h(chisq::Float64, N::Int)
     weight = 0.5
 
     for i = 1:N
-        #TODO: why not iterate until (N - 1) and avoid the "if" statement?!
         if (i < N)
             weight *= 0.5
         end
@@ -54,7 +50,6 @@ function H(a::Float64, b::Float64, N::Int)
     weight = 0.5
 
     for i = 1:N
-        #TODO: why not iterate until (N - 1) and avoid the "if" statement?!
         if (i < N)
             weight *= 0.5
         end
@@ -67,18 +62,33 @@ end
 
 
 function (integrand::IntegrandData)(x::Float64)
-    return h(x, integrand.Nl) * H(integrand.Tobs - x, integrand.Tobs, integrand.Nr)  
+    return h(x, integrand.Nl) * H(integrand.T_obs - x, integrand.T_obs, integrand.Nr)  
 end
 
 
-function Delta(Tobs::T, Nl::Int, Nr::Int, epsrel::U, epsabs::U)
+function Delta(T_obs::Real, Nl::Int, Nr::Int, epsrel::Real, epsabs::Real)
 
     #NOTE:  this doesn't support passing on additional parameters to the integrand function :( is this a problem?
     #       could maybe also work with cubature.jl. is it sensible to only use one package?
-    F = IntegrandData(Tobs, Nl, Nr)
+    F = IntegrandData(T_obs, Nl, Nr)
 
-    return quadgk(F, 0, Tobs, rtol = epsrel, atol = epsabs, order = 10)
+    return quadgk(F, 0, T_obs, rtol = epsrel, atol = epsabs, order = 10)
 end
+
+
+function approx_cumulative(T_obs::Real, N::Int, n::Real, epsrel::Real = nothing, epsabs::Real = nothing)
+
+    F = cumulative(T_obs, N)
+    Fn1 = (F / (1 + Delta(T_obs, N, N, epsrel, epsabs)[1]))^(n - 1)
+    return F * Fn1
+end
+
+
+function approx_pvalue(T_obs::Real, N::Int, n::Real, epsrel::Real, epsabs::Real)
+
+    return 1 - approx_cumulative(T_obs, N, n, epsrel, epsabs)
+end
+
 
 #=
 
@@ -87,23 +97,23 @@ function (c_int::CubaIntegrandData)(uv::AbstractArray) # analog to cubature_inte
 
     u = uv[1]
     v = uv[2]
-    x = c_int.Tobs * u * (1 - v) + c_int.Tobs * (1 - u)
-    y = c_int.Tobs * u * v + c_int.Tobs * (1 - u)
-    jac = c_int.Tobs * c_int.Tobs * u
+    x = c_int.T_obs * u * (1 - v) + c_int.T_obs * (1 - u)
+    y = c_int.T_obs * u * v + c_int.T_obs * (1 - u)
+    jac = c_int.T_obs * c_int.T_obs * u
 
     fval = jac * h(x, c_int.Nl) * h(y, c_int.Nr)
-    fval *= (c_int.spline && c_int.acc) ? spline_eval(c_int.spline, x + y, c_int.acc) : cumulative(c_int.Tobs, c_int.Nl + c_int.Nr)
+    fval *= (c_int.spline && c_int.acc) ? spline_eval(c_int.spline, x + y, c_int.acc) : cumulative(c_int.T_obs, c_int.Nl + c_int.Nr)
 
     return fval
 end 
 
 
-function full_correction(Tobs::Float64, Nl::Int, Nr::Int, epsrel::Float64, epsabs::Float64, ninterp::Int) # what is this even exactly supposed to do??
+function full_correction(T_obs::Real, Nl::Int, Nr::Int, epsrel::Real, epsabs::Real, ninterp::Int) # what is this even exactly supposed to do??
 
 
     #wonky at best
 
-    data = CubaIntegrandData(Tobs, Nl, Nr, 0)
+    data = CubaIntegrandData(T_obs, Nl, Nr, 0)
 
     #find out how to emulate the stuff with null pointers in the c++ code
 
@@ -116,7 +126,7 @@ function full_correction(Tobs::Float64, Nl::Int, Nr::Int, epsrel::Float64, epsab
         y = zeros(ninterp)
 
         for i in range(1, ninterp)
-            x[i] = Tobs + i * Tobs / (ninterp - 1)
+            x[i] = T_obs + i * T_obs / (ninterp - 1)
             y[i] = cumulative(x[i], Nl + Nr)
         end
 
@@ -154,18 +164,3 @@ function full_correction(Tobs::Float64, Nl::Int, Nr::Int, epsrel::Float64, epsab
 
 end
 =#
-
-
-function approx_cumulative(Tobs::T, N::Int, n::T, epsrel::U = nothing, epsabs::U = nothing)
-
-    F = cumulative(Tobs, N)
-    Fn1 = (F / (1 + Delta(Tobs, N, N, epsrel, epsabs)[1]))^(n - 1)
-    return F * Fn1
-end
-
-
-
-function approx_pvalue(Tobs::T, N::Int, n::T, epsrel::U = nothing, epsabs::U = nothing)
-
-    return 1 - approx_cumulative(Tobs, N, n, epsrel, epsabs)
-end

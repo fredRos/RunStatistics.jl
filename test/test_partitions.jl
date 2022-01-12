@@ -3,9 +3,9 @@
 using RunStatistics
 using Test
 
-p = RunStatistics.partition(6, 3)
-
 @testset "partitions" begin
+
+    p = RunStatistics.partition(6, 3)
 
     for i = 0:2
 

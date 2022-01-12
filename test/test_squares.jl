@@ -4,12 +4,14 @@
 using RunStatistics
 using Test
 
-Tobs = 3.4
-N = 30
+
 
 @testset "squares" begin
-    @test pvalue(Tobs, N) ≈ 0.818208032939994
-    @test cumulative(Tobs, N) ≈ 0.18179196706000597
+    T_obs = 3.4
+    N = 30
+    
+    @test pvalue(T_obs, N) ≈ 0.818208032939994
+    @test cumulative(T_obs, N) ≈ 0.18179196706000597
 end
 
 # test agains the c++ version 

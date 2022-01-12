@@ -25,26 +25,27 @@ function cachefactorials(N::Integer)
 end
 
 
-function cachechi2(Tobs::Real, N::Integer)
+function cachechi2(T_obs::Real, N::Int)
 
     @argcheck 0 < N
 
     res = zeros(N + 1)
     res[1] = NaN
 
-    Threads.@threads for i = 2:(N + 1)
-        res[i] = logcdf(Chisq(i - 1), Tobs)
+    for i = firstindex(res)+1:lastindex(res)
+        
+        res[i] = logcdf(Chisq(i - 1), T_obs)
     end
 
     return res
 end
 
 """
-    cumulative(Tobs::Float64, N::Int)
+    cumulative(T_obs::Float64, N::Int)
 
 Compute the cumulative distribution of the weighted-runs, or SQUARES, statistic `T`.
 
-`Tobs` is the value of the test statistic for the observed data set; i.e., the largest chi^2 of 
+`T_obs` is the value of the test statistic for the observed data set; i.e., the largest chi^2 of 
 any run of consecutive observed values above the expectation. `N` is the total number of data points.
 
 The calculation implements Eqns. (16) and (17) from Frederik Beaujean and Allen Caldwell. “A Test Statistic for
@@ -53,11 +54,11 @@ no. 11 (November 2011): 3437–46. doi:10.1016/j.jspi.2011.04.022
 http://arxiv.org/abs/1005.3233.
 
 """
-function cumulative(Tobs::Real, N::Integer)
+function cumulative(T_obs::Real, N::Int)
 
     cachefactorials(N)
 
-    log_cumulative = cachechi2(Tobs, N)
+    log_cumulative = cachechi2(T_obs, N)
 
     logpow2N1 = (N <= 63) ? log((1 << N) - 1) : N * log(2)
 
@@ -106,15 +107,15 @@ function cumulative(Tobs::Real, N::Integer)
 end
 
 """
-    pvalue(Tobs::Float64, N::Int)
+    pvalue(T_obs::Float64, N::Int)
 
-    Compute the p value P(T >= `Tobs` | `N`) with `Tobs` being the value of the squares test statistic,
+    Compute the p value P(T >= `T_obs` | `N`) with `T_obs` being the value of the squares test statistic,
     i.e. the larges chi^2 of any run of consecutive successes (above expectation) in a sequence of `N` 
     independent trials with Gaussian uncertainty.
 """
-function pvalue(Tobs::Real, N::Integer)
+function pvalue(T_obs::Real, N::Int)
 
-    return 1 - cumulative(Tobs, N)
+    return 1 - cumulative(T_obs, N)
 
 end
 
