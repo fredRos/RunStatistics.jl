@@ -2,34 +2,39 @@
 
 export approx_cumulative, approx_pvalue
 
-# NOTE: in many cases the Float64s here could probably be of a smaller type e.g. Float34 or something. check if it  makes a difference
-# NOTE: is this a good way to implement methods with different argument types?
+"""
+    IntegrandData
 
+Represent the parameters needed for the 1D numerical integration performed in `Delta()`.
 
+`T_obs` is the value for the Squares statistic observed in the data, `Nl` the left-hand lenght and 
+`Nr` the right-hand lenght of a boundary spanning run, as defined in section II.A. in
+
+Frederik Beaujean and Allen Caldwell. *Is the bump significant? An axion-search example*
+
+https://arxiv.org/abs/1710.06642
+"""
 mutable struct IntegrandData
     T_obs::Float64
     Nl::Int
     Nr::Int
 end
 
-#=
+"""
+    h(chisq::Real, N::Integer)
 
-mutable struct CubaIntegrandData
+Compute the probability density h(χ2 | Nr) for the right-hand side of a boundary spanning run to be above expectation; 
+as explained in section II.A. in the paper below.
 
-    T_obs::Real # check if needs to be Real, or something less suffices. also with IntegrandData
-    Nl::Int 
-    Nr::Int
-    counter::Int
-    spline::Any
-    acc::Any
+Caclulate it as the sum of probability densities for runs of different length times the χ2 probability for that number of degrees of freedom.
 
-end
+Implements the term defined in equation (8) in 
 
-d = CubaIntegrandData(1.0, 1, 1, 0, 0, 0)
+Frederik Beaujean and Allen Caldwell. *Is the bump significant? An axion-search example*
 
-=#
-
-function h(chisq::Float64, N::Int)
+https://arxiv.org/abs/1710.06642
+"""
+function h(chisq::Real, N::Integer)
     res = 0
     weight = 0.5
 
@@ -44,7 +49,16 @@ function h(chisq::Float64, N::Int)
 end
 
 
-function H(a::Float64, b::Float64, N::Int)
+"""
+    H(a::Real, b::Real, N::Integer)
+
+Compute the cumulative of `h()` as defined in section II.A. in
+
+Frederik Beaujean and Allen Caldwell. *Is the bump significant? An axion-search example*
+
+https://arxiv.org/abs/1710.06642
+"""
+function H(a::Real, b::Real, N::Integer)
 
     res = 0
     weight = 0.5
@@ -60,23 +74,57 @@ function H(a::Float64, b::Float64, N::Int)
     return res
 end
 
+"""
+    (integrand::IntegrandData)(x::Real)
 
-function (integrand::IntegrandData)(x::Float64)
+Compute the integrand in the Δ(T_obs | N_l, N_r) term defined in equation (13) in 
+
+Frederik Beaujean and Allen Caldwell. *Is the bump significant? An axion-search example*
+
+https://arxiv.org/abs/1710.06642
+"""
+function (integrand::IntegrandData)(x::Real)
     return h(x, integrand.Nl) * H(integrand.T_obs - x, integrand.T_obs, integrand.Nr)  
 end
 
+ 
+"""
+    Delta(T_obs::Real, Nl::Integer, Nr::Integer, epsrel::Real, epsabs::Real)
 
-function Delta(T_obs::Real, Nl::Int, Nr::Int, epsrel::Real, epsabs::Real)
+Compute the Δ(T_obs | N_l, N_r) term defined in equation (13) in 
 
-    #NOTE:  this doesn't support passing on additional parameters to the integrand function :( is this a problem?
-    #       could maybe also work with cubature.jl. is it sensible to only use one package?
+Frederik Beaujean and Allen Caldwell. *Is the bump significant? An axion-search example*
+
+https://arxiv.org/abs/1710.06642
+
+The calculation involves a 1D numerical integration using the `quadgk()` function with the 
+relative and absolute target precision `epsrel` and `epsabs`. If not specified, the default values of `quadgk()` are used.
+See https://juliamath.github.io/QuadGK.jl/stable/ for documentation.
+"""
+function Delta(T_obs::Real, Nl::Integer, Nr::Integer, epsrel::Real, epsabs::Real)
+
     F = IntegrandData(T_obs, Nl, Nr)
-
     return quadgk(F, 0, T_obs, rtol = epsrel, atol = epsabs, order = 10)
 end
 
+"""
+approx_cumulative(T_obs::Real, N::Integer, n::Real, [epsrel::Real, epsabs::Real])
 
-function approx_cumulative(T_obs::Real, N::Int, n::Real, epsrel::Real = nothing, epsabs::Real = nothing)
+Compute an approximation of P(T < `T_obs` | `n * N`), the value of the cumulative distribution function for the Squares test statistic at `T_obs`, 
+the value of the Squares statistic observed in the data. 
+The total number of datapoints is `n * N`
+
+The approximation involves a 1D numerical integration whose relative and absolute target precision are `epsrel` and `epsabs`. 
+These are optional arguments here and if left empty, the default values of the `quadgk()` function are used. See https://juliamath.github.io/QuadGK.jl/stable/
+
+This function implements equation (17) from:
+
+Frederik Beaujean and Allen Caldwell. *Is the bump significant? An axion-search example*
+
+https://arxiv.org/abs/1710.06642
+  
+"""
+function approx_cumulative(T_obs::Real, N::Integer, n::Real, epsrel::Real = nothing, epsabs::Real = nothing)
 
     F = cumulative(T_obs, N)
     Fn1 = (F / (1 + Delta(T_obs, N, N, epsrel, epsabs)[1]))^(n - 1)
@@ -84,13 +132,46 @@ function approx_cumulative(T_obs::Real, N::Int, n::Real, epsrel::Real = nothing,
 end
 
 
-function approx_pvalue(T_obs::Real, N::Int, n::Real, epsrel::Real, epsabs::Real)
+"""
+    approx_pvalue(T_obs::Real, N::Integer, n::Real, [epsrel::Real, epsabs::Real])
+
+Compute an approximation of P(T >= `T_obs` | `n * N`), the p value for the Squares test statistic T being larger or equal to `T_obs`, 
+the value of the Squares statistic observed in the data. 
+The total number of datapoints is `n * N`.
+
+The approximation involves a 1D numerical integration whose relative and absolute target precision are `epsrel` and `epsabs`. 
+These are optional arguments here and if left empty, the default values of the `quadgk()` function are used. See https://juliamath.github.io/QuadGK.jl/stable/
+
+Via `approx_cumulative` this function implements equation (17) from:
+
+Frederik Beaujean and Allen Caldwell. *Is the bump significant? An axion-search example*
+
+https://arxiv.org/abs/1710.06642
+  
+"""
+function approx_pvalue(T_obs::Real, N::Integer, n::Real, epsrel::Real, epsabs::Real)
 
     return 1 - approx_cumulative(T_obs, N, n, epsrel, epsabs)
 end
 
 
+
+
+
 #=
+
+mutable struct CubaIntegrandData
+
+    T_obs::Real # check if needs to be Real, or something less suffices. also with IntegrandData
+    Nl::Int 
+    Nr::Int
+    counter::Int
+    spline::Any
+    acc::Any
+
+end
+
+d = CubaIntegrandData(1.0, 1, 1, 0, 0, 0)
 
 function (c_int::CubaIntegrandData)(uv::AbstractArray) # analog to cubature_integrand in fred's code. investigate the storage pointers he uses 
     c_int.counter += 1 

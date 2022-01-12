@@ -5,7 +5,7 @@ using Test
 
 @testset "partitions" begin
 
-    p = RunStatistics.partition(6, 3)
+    p = RunStatistics.init_partition(6, 3)
 
     for i = 0:2
 

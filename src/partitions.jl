@@ -3,9 +3,16 @@
 """
     Partition(n::Int, k::Int, h::Int, c::Vector{Int}, y::Vector{Int})
 
-Represent the integer partition of `n` into `k` parts, with n = \\sum_{i=1}^h c_i * y_i; `h` is the number of distinct parts, `y` the parts and `c` their multiplicities.
+Express the integer partition of `n` into `k` parts in the mulitplicity representation with `n = \\sum_{i=2}^(h + 1) c_i * y_i`. 
 
-When reading: ignore first element of `c` and `y` and do not read beyond `c[h + 1]`, `y[h + 1]`.
+(see https://en.wikipedia.org/wiki/Partition_(number_theory))
+
+`h` is the number of distinct parts, `y` an array containing the distinct parts and `c` an array containing their multiplicities.
+
+NOTE: due to the computation of subsequent paritions with the algorithm used in `next_partition!()` the arrays `y` and `c` only hold relevant 
+values for the indices [2, h + 1] 
+
+When reading a partition: ignore the first element of `c` and `y` and do not read beyond `c[h + 1]`, `y[h + 1]`!
 """
 mutable struct Partition
     n::Int
@@ -16,13 +23,17 @@ mutable struct Partition
 end
 
 """
-    partition(n::Int, k::Int)
+    init_partition(n::Int, k::Int)
 
-Initiate the first partition of an integer `n` into `k` parts, arguments must satisfy `0 < k <= n`. 
+Initiate the first partition of an integer `n` into `k` parts; arguments must satisfy `0 < k <= n`. 
+Returns an object of type `Partition`.
 
-Returns an object of type `Partition`
+The elements in `y[1]` and `c[1]`, of the arrays `y` and `c` containing the distinct parts and their mulitplicities, are buffer values needed for the computation of the next partition 
+in `next_partition!()`.
+
+When reading a partition: ignore the first element of `c` and `y` and do not read beyond `c[h + 1]`, `y[h + 1]`: `n = \\sum_{i=2}^(h + 1) c_i * y_i`.
 """
-function Partition(n::Integer, k::Integer)
+function init_partition(n::Integer, k::Integer)
 
     @argcheck 0 < k <= n
 
@@ -54,9 +65,13 @@ function Partition(n::Integer, k::Integer)
 end
 
 """
-    next_partition!(p::partition)
+    next_partition!(p::Partition)
 
-Compute the next partition of `p`, updating it in place. Returns a `boolean` corresponding to whether the final partition has been reached. 
+Compute the next partition of `p`, using a modified version of Algorithm Z from *A. Zoghbi: Algorithms for generating integer partitions, Ottawa (1993)*,
+http://www.ruor.uottawa.ca/handle/10393/6506. 
+
+The partition `p` is updated in place, saving memory. 
+Returns a `boolean` corresponding to whether the final partition has been reached. 
 """
 function next_partition!(p::Partition)
 
