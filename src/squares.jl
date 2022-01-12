@@ -77,7 +77,7 @@ function cumulative(T_obs::Real, N::Int)
             scale = poch - logpow2N1
             ppi = 0.0
 
-            g = Partition(r, M)
+            g = init_partition(r, M)
             n = g.c
             y = g.y
 
