@@ -43,7 +43,7 @@ http://arxiv.org/abs/1005.3233.
 """
 function cumulative(T_obs::Real, N::Integer)
 
-    T = promote_type(T_obs, N)
+    T = promote_type(typeof(T_obs), typeof(N))
 
     if N >= length(log_factorial)
 

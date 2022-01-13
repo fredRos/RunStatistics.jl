@@ -5,7 +5,7 @@
 [![Build Status](https://github.com/bat/RunStatistics.jl/workflows/CI/badge.svg?branch=main)](https://github.com/bat/RunStatistics.jl/actions?query=workflow%3ACI)
 [![Codecov](https://codecov.io/gh/bat/RunStatistics.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/bat/RunStatistics.jl)
 
-This package implements the cumulative distribution function of the weighted-runs statistic originally defined in 
+This package implements the evaluation of the cumulative distribution function P(T < T_obs | N) of the weighted-runs statistic  originally defined in 
 
 Frederik Beaujean and Allen Caldwell. *A Test Statistic for Weighted Runs*. Journal of Statistical Planning and Inference 141, no. 11 (November 2011): 3437–46. [doi:10.1016/j.jspi.2011.04.022](http://dx.doi.org/10.1016/j.jspi.2011.04.022) [arXiv:1005.3233](http://arxiv.org/abs/1005.3233)
 
@@ -28,8 +28,14 @@ julia> pkg"add RunStatistics"
 ```
 
 ## SQUARES statistic
+To use the RunStatistics.jl package after installing it, do:
 
-When calculating the p value P(T >= Tobs | N) for a sequence of `N` observations, first the value of the SQUARES test statistic `Tobs` needs to be calculated. It denotes the largest $\chi^2$ of any run of consecutive successes (above expectation) in a sequence of `N` independent trials with Gaussian uncertainty
+```Julia
+julia> using RunStatistics
+```
+When calculating the p value P(T >= T_obs | N) for a sequence of `N` independent observations with gaussian uncertainty, first the observed value of the `Squares test statistic` `T_obs` needs to be calculated. 
+
+`T_obs` denotes the largest `χ^2` of any run of consecutive successes (above expectation) in this sequence of observations.
 
 For the Squares statistic to be calculable, the observed data must satisfy following conditions:
 
@@ -37,10 +43,10 @@ For the Squares statistic to be calculable, the observed data must satisfy follo
 > 2. Each observation is normally distributed, X_i ∼ N( µ_i, σ^2_i ). 
 > 3. Mean µ_i and variance σ^2_i are known.
 
-Calculating `Tobs` for the observed data X_i is done with the `tobs()` function:
+Calculating `T_obs` for the observed data X_i is done with the `t_obs()` function:
 
 ```Julia
-Tobs = tobs(X::AbstractArray, μ::Real, σ2::Real)
+T_obs = t_obs(X::AbstractArray, μ::Real, σ2::Real)
 ```
 
 Where `X` is a vector containing the observations, and `μ` and `σ2` are their mean and variance.
@@ -48,29 +54,37 @@ Where `X` is a vector containing the observations, and `μ` and `σ2` are their 
 If the obvservations don't all have the same mean and variance, use:
 
 ```Julia
-Tobs = tobs(X::AbstractArray, μ::AbstractArray, σ2::AbstractArray)
+T_obs = T_obs(X::AbstractArray, μ::AbstractArray, σ2::AbstractArray)
 ```
 
 with the i-th elements of `μ` and `σ2` being the mean and variance of the i-th element of `X`.
 
-The cumulative distribution `P(T < Tobs | N)` and the p value `P(T >= Tobs | N)` are calculated by:
+The cumulative distribution `P(T < T_obs | N)` and the p value `P(T >= T_obs | N)` at the observed value `T_obs` are calculated with:
 
 ```Julia 
-julia> cumulative(Tobs::Float64, N::Int)
+julia> cumulative(T_obs::Float64, N::Int)
 
-julia> pvalue(Tobs::Float64, N::Int)
+julia> pvalue(T_obs::Float64, N::Int)
 ```
 
 ### Approximation for large N
 
-For large `N`, the number of therms in the exact expression scales like `exp(N^1/2)/N` and quickly grows too large. An approximate formula is implemented here for `n*N`, where the cumulative for example `N = 100` is computed exactly and `n` may be 1 or >> `N` and need not even be an integer. 
+For large `N`, the number of terms in the exact expression scales like `exp(N^1/2)/N` and quickly grows too large. An approximate formula is implemented here for cases when the total number of data points is `n*N`.
 
-The cumulative distribution P(T < Tobs | n\*N) and the p value P(T >= Tobs | n\*N) are approximated by:
+So for example, if 50 000 data points were collected, choose `N = 50` and `n = 1000`.
+
+For this example the approximation the cumulative for `N = 50` is computed exactly and then further processed to obtain the desired approximation, via equation (17) from 
+
+Frederik Beaujean and Allen Caldwell. *Is the bump significant? An axion-search example* [arXiv:1710.06642](http://arxiv.org/abs/1710.06642)
+
+As a rule of thumb, `N` should not exceed `100`. 
+
+The cumulative distribution P(T < T_obs | n\*N) and the p value P(T >= T_obs | n\*N) are approximated by:
 
 ```Julia 
-julia> approx_cumulative(Tobs::Float64, N::Int, n::Float64, [epsrel::Float64, epsabs::Float64])
+julia> approx_cumulative(T_obs::Float64, N::Int, n::Float64, [epsrel::Float64, epsabs::Float64])
 
-julia> approx_pvalue(Tobs::Float64, N::Int, n::Float64, [epsrel::Float64, epsabs::Float64])
+julia> approx_pvalue(T_obs::Float64, N::Int, n::Float64, [epsrel::Float64, epsabs::Float64])
 ```
 
 The approximation involves a 1D numerical integration whose relative and absolute target precision are `epsrel` and `epsabs`; these are `optional arguments` in the above functions. 
