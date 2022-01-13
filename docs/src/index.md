@@ -1,6 +1,3 @@
 # RunStatistics.jl
 
-
-```@docs
-RunStatistics.Partition()
-```
+Hello github
