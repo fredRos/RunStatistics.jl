@@ -27,7 +27,6 @@ using QuadGK
 using ArgCheck
 using Distributions
 
-
 include("t_obs.jl")
 include("partitions.jl")
 include("squares.jl")

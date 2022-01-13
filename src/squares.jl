@@ -23,9 +23,10 @@ end
 """
     cumulative(T_obs::Real, N::Integer)
 
-Compute P(T < T_obs | N), the value of the cumulative distribution of the Squares statistic `T` at the value `T_obs` observed in the data.
+Compute P(T < T_obs | N), the value of the cumulative distribution of the Squares statistic `T` at the 
+value `T_obs` observed in the data.
 
-`T_obs` is the value of the test statistic for the observed data set; i.e., the largest χ^2 of 
+`T_obs` is the value of the test statistic for the observed data set; i.e., the largest `χ^2` of 
 any run of consecutive observed values above the expectation in a sequence of `N` independent trials 
 with Gaussian uncertainty. 
 
@@ -41,6 +42,8 @@ http://arxiv.org/abs/1005.3233.
 
 """
 function cumulative(T_obs::Real, N::Integer)
+
+    T = promote_type(T_obs, N)
 
     if N >= length(log_factorial)
 
@@ -61,11 +64,14 @@ function cumulative(T_obs::Real, N::Integer)
 
     logpow2N1 = (N <= 63) ? log((1 << N) - 1) : N * log(2)
 
+    p = zero(T)
+
     # p = Threads.Atomic{float(T)}(0)
-    Ps = zeros(Real, numthreads)
+    # Ps = zeros(Real, numthreads)
 
     #TODO: think about creating a Partition() object for each thread and then initiate it within the thread
-    Threads.@threads for r = 1:N
+    #Threads.@threads 
+    for r = 1:N
 
         Mmax = min(r, N - r + 1)
         poch = 0.0
@@ -96,10 +102,11 @@ function cumulative(T_obs::Real, N::Integer)
                 done = next_partition!(g)
             end
 
-            Ps[threadid()] += exp(scale + log(ppi))
+            #Ps[threadid()] += exp(scale + log(ppi))
+            p += exp(scale + log(ppi))
         end
     end
-    p = sum(Ps)
+    #p = sum(Ps)
 
     @assert p < 1
     return p
@@ -108,14 +115,17 @@ end
 """
     pvalue(T_obs::Real, N::Integer)
 
-Compute P(T >= `T_obs` | `N`), the p value for the Squares test statistic `T` being larger or equal to `T_obs`, the value of the Squares statistic observed in the data. 
+Compute P(T >= `T_obs` | `N`), the p value for the Squares test statistic `T` being larger or equal to `T_obs`, 
+the value of the Squares statistic observed in the data. 
+
 `N` is the total number of data points.
 
-The Squares statistic `T` denotes the largest χ^2 of any run of consecutive successes (above expectation) in a sequence of `N` independent trials with Gaussian uncertainty.
+The Squares statistic `T` denotes the largest `χ^2` of any run of consecutive successes (above expectation) in a 
+sequence of `N` independent trials with Gaussian uncertainty.
 
 `T_obs` is the value of the test statistic for the observed data, `N` is the total number of data points.
 
-See:
+Via `cumulative()` this function inmplements equations (16) and (17) from
 
 Frederik Beaujean and Allen Caldwell. *A Test Statistic for
 Weighted Runs.* Journal of Statistical Planning and Inference 141,
