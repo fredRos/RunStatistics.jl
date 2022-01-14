@@ -14,7 +14,7 @@ Frederik Beaujean and Allen Caldwell. *Is the bump significant? An axion-search 
 
 https://arxiv.org/abs/1710.06642 
 
-Where they renamed the weighted-runs statistic to the `*SQUARES statistic*`.
+Where they renamed the weighted-runs statistic to the `*Squares statistic*`.
 This code is based on the original implementation by Frederik Beaujean in c++ and mathematica:
 
 https://github.com/fredRos/runs
@@ -26,6 +26,7 @@ using Distributions
 using QuadGK
 using ArgCheck
 using Distributions
+# using Threads
 
 include("t_obs.jl")
 include("partitions.jl")

@@ -38,7 +38,7 @@ Frederik Beaujean and Allen Caldwell. *A Test Statistic for
 Weighted Runs.* Journal of Statistical Planning and Inference 141,
 no. 11 (November 2011): 3437–46. doi:10.1016/j.jspi.2011.04.022
 
-http://arxiv.org/abs/1005.3233.
+https://arxiv.org/abs/1005.3233.
 
 """
 function cumulative(T_obs::Real, N::Integer)
@@ -131,7 +131,7 @@ Frederik Beaujean and Allen Caldwell. *A Test Statistic for
 Weighted Runs.* Journal of Statistical Planning and Inference 141,
 no. 11 (November 2011): 3437–46. doi:10.1016/j.jspi.2011.04.022
 
-http://arxiv.org/abs/1005.3233.
+https://arxiv.org/abs/1005.3233.
   
 """
 function pvalue(T_obs::Real, N::Integer)
@@ -140,26 +140,3 @@ function pvalue(T_obs::Real, N::Integer)
 
 end
 
-
-
-#=
-function cachefactorials(N::Integer)
-
-    if N < length(log_factorial)
-        return length(log_factorial)
-    end
-
-    sizehint!(log_factorial, N)
-
-    if isempty(log_factorial)
-        push!(log_factorial, 0.0)
-    end
-
-    for i = length(log_factorial):N
-        push!(log_factorial, last(log_factorial) + log(i))
-    end
-
-    return length(log_factorial)
-end
-
-=#

@@ -68,7 +68,7 @@ end
     next_partition!(p::Partition)
 
 Compute the next partition of `p`, using a modified version of Algorithm Z from *A. Zoghbi: Algorithms for generating integer partitions, Ottawa (1993)*,
-http://www.ruor.uottawa.ca/handle/10393/6506. 
+https://www.ruor.uottawa.ca/handle/10393/6506. 
 
 The partition `p` is updated in place, saving memory. 
 Returns a `boolean` corresponding to whether the final partition has been reached. 
@@ -127,51 +127,3 @@ function next_partition!(p::Partition)
     end
 end
 
-
-#=
-"""
-    final_partition(p::partition)
-
-Check whether `p` is the final partition. Returns a `boolean`.
-"""
-function final_partition(p::Partition)
-    return p.y[p.h+1] - p.y[2] <= 1
-end
-
-
-struct AbstractPartitionGenerator
-
-    function bool(p::AbstractPartitionGenerator)
-        return !p.done
-    end
-
-    # some stuff again with adresses
-    AbstractPartitionGenerator(p::Partition)
-
-    function final_partition(p::partition)
-        return p.y[p.h + 1] - p.y[2] <= 1 
-    end
-
-
-    # might be a problem, is 'virtual bool' in c++
-    done::Bool
-    p::typeof(p) # does this make sense?
-end
-
-
-
-struct PartitionsGenerator <: AbstractPartitionGenerator
-    PartitionsGenerator(n::Int, k::Int)
-
-    operator++()::PartitionsGenerator
-     # problem with final_partition() in parent, how does the override work in julia?
-
-
-end
-
-
-function PartitionGenerator.final_partition()
-    return
-end
-
-=#
