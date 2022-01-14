@@ -20,7 +20,7 @@ This code is based on the [original implementation](https://github.com/fredRos/r
 
 ## Installation
 
-To install RunStatistics.jl, start Julia and run 
+To install `RunStatistics.jl`, start Julia and run 
 
 ```Julia
 julia> using Pkg
