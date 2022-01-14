@@ -31,7 +31,7 @@ The `Squares test statistic`, in the following denoted with `T`, is a test stati
 
 It supplements the classic [$\chi^2$ test](https://en.wikipedia.org/wiki/Chi-squared_test) which ignores the ordering of observations and provides additional sensitivity to local deviations from expectations. 
 
-The Squares test statistic, or `Squares statistic` for short, based on `runs` of weighted deviations from a mean value, observed in samples from independent normal distributions. 
+The Squares test statistic, or `Squares statistic` for short, is based on `runs` of weighted deviations from a mean value, observed in samples from independent normal distributions. 
 
 A `run` in this context refers to a sequence of observations that share a common attribute commonly called a `success`. Here an observation is called a *success*, $S$, if the observed value exceeds the expected value. Similarly an expected value exceeding the observation is considered a *failure*, $F$.
 
@@ -39,7 +39,7 @@ The `Squares statistic` $T$ is formally defined in three steps:
 
 
 1.  Split the data ${X_i}$ into runs. Keep the success runs and ignore the
-    failure runs. Denote by $A_j = {X_{j_1} ,X_{j_2} ...}$ the set of 
+    failure runs. Denote by $A_j = \{X_{j_1} ,X_{j_2}, ...\}$ the set of 
     observations in the $j$-th success run.
 
 2.  Associate a weight with each success run. The weight $\omega(A_j)$ ought 
@@ -47,10 +47,19 @@ The `Squares statistic` $T$ is formally defined in three steps:
     model and observations. A natural choice of the weight function is a 
     convenient one-to-one function of the probability (density) of $A_j$ such as 
 
-    $\quad\quad\quad\quad\quad\quad\quad\quad$ $\omega(A_j) = [P (A_j | \mathcal{H})]^{-1}$ $\quad$ or $\quad$ $\omega(A_j) = −~2\log(P (A_j | \mathcal{H}))$
-
+$$
+\begin{align}
+\omega(A_j) = [P (A_j | \mathcal{H})]^{-1} \quad \text{or} \quad \omega(A_j) = −~2\log(P (A_j | \mathcal{H}))
+\end{align}
+$$
 
 
 3. Choose $T$ as the largest weight:
-    $T \equiv \max_j \omega(A_j)$ .
+
+$$
+\begin{align}
+T \equiv \max_j \omega(A_j)
+\end{align}
+$$
+
 
