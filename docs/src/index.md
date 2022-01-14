@@ -75,7 +75,7 @@ SSSFFSFFFSSF
 where ``S`` denotes a *success*, a value above the expected value, and ``F`` a *failure*. In accordance with the above steps, only the success runs are considered:
 
 ```math
-\underbrace{\mathbf{SSS}}_{1}~~FF\underbrace{\mathbf{S}}_{2}FFF~\underbrace{\mathbf{SS}}_{3}~F 
+\underbrace{\mathbf{SSS}}_{A_1}~~FF\underbrace{\mathbf{S}}_{A_2}FFF~\underbrace{\mathbf{SS}}_{A_3}~F 
 ```
 For each of the three success runs ``A_j`` observed in this example, the weight ``\omega(A_j)=\chi_{run,j}^2`` is calculated. The value ``T_{obs}``, denoting the observed value of ``T`` in this sequence of data is then the maximum of the three weights ``T_{obs} = \max_j \omega(A_j)``.
 
