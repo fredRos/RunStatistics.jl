@@ -1,6 +1,6 @@
 # Guide
 ---
-The following guide provides information on how to install and use the `RunStatistics.jl` package and the functions it provides and on some of their the implementation. 
+The following guide provides information on how to install and use the `RunStatistics.jl` package and the functions it provides, and on some of their implementation. 
 
 ```@contents
 Pages = ["guide.md"]
@@ -54,7 +54,7 @@ The full derivation of ``P(T < T_{obs} | N)`` and an explanation for the paramet
 
 For this manual, suffice it to say that the only input parameters that need to be known are ``T_{obs}`` and ``N``, the total number of observed data points. The other parameters are then calculated from them.
 
-The computationally expensive operation is the sum over ``\pi``. Here ``\pi`` denotes the set of inequivalent sequences of success and failure runs. Given a total number ``r`` of successes in a sequence of ``N`` observations with ``M`` success runs, ``\pi`` is in one-to-one correspondence with the set of [*integer partitions*](https://en.wikipedia.org/wiki/Partition_(number_theory)) of ``r`` into ``M`` summands [^2].
+The computationally expensive operation is the sum over ``\pi``. Here ``\pi`` denotes the set of inequivalent sequences of success and failure runs in the observed sequence of data. Given a total number ``r`` of successes in a sequence of ``N`` observations with ``M`` success runs, ``\pi`` is in one-to-one correspondence with the set of [*integer partitions*](https://en.wikipedia.org/wiki/Partition_(number_theory)) of ``r`` into ``M`` summands [^2].
 
 When the cumulative of ``T`` is evaluated at ``T_{obs}`` for ``N`` data points, the relevant partitions need to be calculated.
 
@@ -108,7 +108,7 @@ p = 1 - F(T_{obs} | nN)
 \end{align}
 ```
 
-``\Delta(T_{obs})`` is a correction term (see equation (13) in [^2]) whose computation involves a 1D numerical integration. This is performed with the `quadgk()` function from the [`QuadGK.jl`](https://juliapackages.com/p/quadgk) package. When calling the `squares_cdf_approx()` or `squares_pvalue_approx()` functions, the optional arguments`epsrel` and `epsabs` are the relative and absolute target precision of the integration performed in `quadgk()`. If not specified, the default values of `quadgk()` are used. See [documentation](https://juliamath.github.io/QuadGK.jl/stable/).
+``\Delta(T_{obs})`` is a correction term (see equation (13) in [^2]) whose computation involves a 1D numerical integration. This is performed with the `quadgk()` function from the [`QuadGK.jl`](https://juliapackages.com/p/quadgk) package. When calling the `squares_cdf_approx()` or `squares_pvalue_approx()` functions, the optional arguments `epsrel` and `epsabs` are the relative and absolute target precision of the integration performed in `quadgk()`. If not specified, the default values of `quadgk()` are used. See [documentation](https://juliamath.github.io/QuadGK.jl/stable/).
 
 
 

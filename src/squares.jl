@@ -1,6 +1,6 @@
 # This file is a part of RunStatistics.jl, licensed under the MIT License (MIT).
 
-export squares_pvalue, cumulative
+export squares_pvalue, squares_cdf
 
 const log_factorial = Vector{Float64}(undef, 0)
 
