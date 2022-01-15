@@ -1,6 +1,6 @@
 # Introduction 
 ---
-This page provides a summarised explanation for the *Squares test statistic* ``T`` and when and in what context it can be used. For a comprehensive derivation and explanation see [^1] and [^2].
+This page provides a summarized explanation for the *Squares test statistic* ``T`` and when and in what context it can be used. For a comprehensive derivation and explanation see [^1] and [^2].
 
 ```@contents
 Pages = ["introduction.md"]

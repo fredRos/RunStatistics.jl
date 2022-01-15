@@ -12,7 +12,7 @@ For the Squares statistic to be calculable, the observed data must satisfy follo
         Each observation is normally distributed, X_i ∼ N( µ_i, σ^2_i ).
         Mean µ_i and variance σ^2_i are known.
 
-In case the observations {X_i} have individiual expectations and variances, use:
+In case the observations {X_i} have individual expectations and variances, use:
 
     t_obs(X::AbstractArray, μ::AbstractArray, σ2::AbstractArray)
 

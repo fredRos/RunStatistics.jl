@@ -3,7 +3,7 @@
 """
     Partition(n::Int, k::Int, h::Int, c::Vector{Int}, y::Vector{Int})
 
-Express the integer partition of `n` into `k` parts in the mulitplicity representation with 
+Express the integer partition of `n` into `k` parts in the multiplicity representation with 
 `n = \\sum_{i=2}^(h + 1) c_i * y_i`. 
 
 (see https://en.wikipedia.org/wiki/Partition_(number_theory))
@@ -11,7 +11,7 @@ Express the integer partition of `n` into `k` parts in the mulitplicity represen
 `h` is the number of distinct parts, `y` an array containing the distinct parts and `c` an 
 array containing their multiplicities.
 
-NOTE: due to the computation of subsequent paritions with the algorithm used in `next_partition!()` 
+NOTE: due to the computation of subsequent partitions with the algorithm used in `next_partition!()` 
 the arrays `y` and `c` only hold relevant 
 values for the indices [2, h + 1] 
 
@@ -33,7 +33,7 @@ Initiate the first partition of an integer `n` into `k` parts; arguments must sa
 Returns an object of type `Partition`.
 
 The elements in `y[1]` and `c[1]`, of the arrays `y` and `c` containing the distinct parts and their 
-mulitplicities, are buffer values needed for the computation of the next partition 
+multiplicities, are buffer values needed for the computation of the next partition 
 in `next_partition!()`.
 
 When reading a partition: ignore the first element of `c` and `y` and do not read beyond `c[h + 1]`, 

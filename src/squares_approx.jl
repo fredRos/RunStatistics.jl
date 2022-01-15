@@ -7,8 +7,8 @@ export squares_cdf_approx, squares_pvalue_approx
 
 Represent the parameters needed for the 1D numerical integration performed in `Delta()`.
 
-`T_obs` is the value for the Squares statistic observed in the data, `Nl` the left-hand lenght and 
-`Nr` the right-hand lenght of a boundary spanning run, as defined in section II.A. in
+`T_obs` is the value for the Squares statistic observed in the data, `Nl` the left-hand length and 
+`Nr` the right-hand length of a boundary spanning run, as defined in section II.A. in
 
 Frederik Beaujean and Allen Caldwell. *Is the bump significant? An axion-search example*
 
@@ -27,7 +27,7 @@ Compute the probability density h(χ2 | Nr) for the right-hand side of a boundar
 run to be above expectation; 
 as explained in section II.A. in the paper below.
 
-Caclulate it as the sum of probability densities for runs of different length times the χ2 
+Calculate it as the sum of probability densities for runs of different length times the χ2 
     probability for that number of degrees of freedom.
 
 Implements the term defined in equation (8) in 
@@ -146,7 +146,7 @@ The total number of datapoints is `n * N`.
 The approximation involves a 1D numerical integration whose relative and absolute target 
 precision are `epsrel` and `epsabs`. 
 These are optional arguments here and if left empty, the default values of the `quadgk()` 
-    function are used. See https://juliamath.github.io/QuadGK.jl/stable/
+function are used. See https://juliamath.github.io/QuadGK.jl/stable/
 
 Via `squares_cdf_approx()` this function implements equation (17) from:
 

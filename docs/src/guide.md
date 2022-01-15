@@ -28,13 +28,68 @@ to gain access to the functions provided in the package.
 ## Using RunStatistics.jl
 ---
 
+To use the ``RunStatistics.jl` to calculate and interpret the Squares statistic for the data you observed, first make sure it satisfies these conditions:
 
+- All observations ``\{X_i\}`` are independent. 
+- Each observation is normally distributed, ``X_i \sim \mathcal{N}(\mu_i, \sigma^2_i)``
+- Mean ``\mu_i`` and variance ``\sigma^2_i`` are known.
+
+If your data satisfies these conditions, bring it into the form of an array `X` of length `N`, so that `X[i]` contains the i-th observation.
+
+To obtain the p-value for the value of the Squares statistic observed in your data, do this:
+
+#TODO: explain main function
+
+### Calculate ``T_{obs}``
+
+To obtain the value of the Squares statistic ``T`` observed in the data, ``T_{obs}``, do:
+
+```Julia
+julia> t_obs(X, μ, σ2)
+```
+
+where ``\mu`` and ``\sigma 2`` are the mean and variance of the normal distribution the data follows.
+
+In case the observations ``\{X_i\}`` have individual expectations and variances, do:
+
+```Julia
+julia> t_obs(X, μ, σ2)
+```
+
+But with ``\mu`` and ``\sigma 2`` being *Arrays* where ``\mu[i]`` and ``\sigma 2[i]`` are the mean and variance of the i-th element of `X`. 
+
+### Calculate the p-value, Evaluate the cumulative distribution function of ``T``
+
+To obtain the p-value given the value of ``T_{obs}`` for `N` data points, or evaluate the cumulative distribution function of ``T`` do:
+
+```Julia
+julia> squares_pvalue(T_obs, N)
+```
+or
+```Julia
+julia> squares_cdf(T_obs, N)
+```
+
+In case the number ``L`` of observations in the data set exceeds ``L \gtrsim 80``, do:
+
+```Julia
+julia> squares_pvalue_approx(T_obs, N, n)
+```
+or
+```Julia
+julia> squares_cdf_approx(T_obs, N, n)
+```
+
+so that ``L = n \cdot N``, ``n`` does not need to be an integer. For information on the choice of ``n`` and ``N``, see [Approximation for large numbers of data](@ref).
+
+
+There is the option to specify the error tolerance of the numerical integration performed during the approximation here, for details see [Approximation for large numbers of data](@ref).
 ## Details of computation
 ---
 
 In the following some more in-depth information on the calculations performed with `RunStatistics` is given.
 
-As during the derivation of the p-value for ``T`` in [^1], the quantity that is actually being computed here is 
+As during the derivation of the p-value for ``T`` in [^1], the quantity that is being computed here is 
 
 ```math
 P(T < T_{obs} | N)
@@ -79,7 +134,7 @@ It is important to note the indexing of the arrays holding the parts and their m
 
 So when reading a partition, always use the above equation: ignore the first element of `c` and `y` and do not read beyond `c[h + 1]` and `y[h + 1]`.
 
-To save memory during the evaluation of the cumulative, a partition object is initated and updated in place during the summation over the set of possible partitions.
+To save memory during the evaluation of the cumulative, a partition object is initiated and updated in place during the summation over the set of possible partitions.
 
 The function that updates a partition is `next_partition!()` it implements a modified version of *Algorithm Z* from 
 

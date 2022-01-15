@@ -120,7 +120,7 @@ the value of the Squares statistic observed in `N` datapoints.
 The Squares statistic `T` denotes the largest `χ^2` of any run of consecutive successes (above expectation) in a 
 sequence of `N` independent trials with Gaussian uncertainty.
 
-Via `squares_cdf()` this function inmplements equations (16) and (17) from
+Via `squares_cdf()` this function implements equations (16) and (17) from
 
 Frederik Beaujean and Allen Caldwell. *A Test Statistic for
 Weighted Runs.* Journal of Statistical Planning and Inference 141,
