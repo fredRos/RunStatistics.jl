@@ -1,6 +1,6 @@
 # This file is a part of RunStatistics.jl, licensed under the MIT License (MIT).
 
-export approx_cumulative, approx_pvalue
+export squares_cdf_approx, squares_pvalue_approx
 
 """
     IntegrandData
@@ -23,10 +23,12 @@ end
 """
     h(chisq::Real, N::Integer)
 
-Compute the probability density h(χ2 | Nr) for the right-hand side of a boundary spanning run to be above expectation; 
+Compute the probability density h(χ2 | Nr) for the right-hand side of a boundary spanning 
+run to be above expectation; 
 as explained in section II.A. in the paper below.
 
-Caclulate it as the sum of probability densities for runs of different length times the χ2 probability for that number of degrees of freedom.
+Caclulate it as the sum of probability densities for runs of different length times the χ2 
+    probability for that number of degrees of freedom.
 
 Implements the term defined in equation (8) in 
 
@@ -47,7 +49,6 @@ function h(chisq::Real, N::Integer)
 
     return res
 end
-
 
 """
     H(a::Real, b::Real, N::Integer)
@@ -86,7 +87,6 @@ https://arxiv.org/abs/1710.06642
 function (integrand::IntegrandData)(x::Real)
     return h(x, integrand.Nl) * H(integrand.T_obs - x, integrand.T_obs, integrand.Nr)  
 end
-
  
 """
     Delta(T_obs::Real, Nl::Integer, Nr::Integer, epsrel::Real, epsabs::Real)
@@ -98,7 +98,8 @@ Frederik Beaujean and Allen Caldwell. *Is the bump significant? An axion-search 
 https://arxiv.org/abs/1710.06642
 
 The calculation involves a 1D numerical integration using the `quadgk()` function with the 
-relative and absolute target precision `epsrel` and `epsabs`. If not specified, the default values of `quadgk()` are used.
+relative and absolute target precision `epsrel` and `epsabs`. If not specified, the default 
+values of `quadgk()` are used.
 See https://juliamath.github.io/QuadGK.jl/stable/ for documentation.
 """
 function Delta(T_obs::Real, Nl::Integer, Nr::Integer, epsrel::Real, epsabs::Real)
@@ -108,14 +109,17 @@ function Delta(T_obs::Real, Nl::Integer, Nr::Integer, epsrel::Real, epsabs::Real
 end
 
 """
-approx_cumulative(T_obs::Real, N::Integer, n::Real, [epsrel::Real, epsabs::Real])
+squares_cdf_approx(T_obs::Real, N::Integer, n::Real, [epsrel::Real, epsabs::Real])
 
-Compute an approximation of P(T < `T_obs` | `n * N`), the value of the cumulative distribution function for the Squares test statistic at `T_obs`, 
+Compute an approximation of P(T < `T_obs` | `n * N`), the value of the cumulative distribution 
+function for the Squares test statistic at `T_obs`, 
 the value of the Squares statistic observed in the data. 
 The total number of datapoints is `n * N`
 
-The approximation involves a 1D numerical integration whose relative and absolute target precision are `epsrel` and `epsabs`. 
-These are optional arguments here and if left empty, the default values of the `quadgk()` function are used. See https://juliamath.github.io/QuadGK.jl/stable/
+The approximation involves a 1D numerical integration whose relative and absolute target 
+precision are `epsrel` and `epsabs`. 
+These are optional arguments here and if left empty, the default values of the `quadgk()` 
+    function are used. See https://juliamath.github.io/QuadGK.jl/stable/
 
 This function implements equation (17) from:
 
@@ -124,35 +128,34 @@ Frederik Beaujean and Allen Caldwell. *Is the bump significant? An axion-search 
 https://arxiv.org/abs/1710.06642
   
 """
-function approx_cumulative(T_obs::Real, N::Integer, n::Real, epsrel::Real = nothing, epsabs::Real = nothing)
+function squares_cdf_approx(T_obs::Real, N::Integer, n::Real, epsrel::Real = nothing, epsabs::Real = nothing)
 
     F = cumulative(T_obs, N)
     Fn1 = (F / (1 + Delta(T_obs, N, N, epsrel, epsabs)[1]))^(n - 1)
     return F * Fn1
 end
 
-
 """
-    approx_pvalue(T_obs::Real, N::Integer, n::Real, [epsrel::Real, epsabs::Real])
+    squares_pvalue_approx(T_obs::Real, N::Integer, n::Real, [epsrel::Real, epsabs::Real])
 
-Compute an approximation of P(T >= `T_obs` | `n * N`), the p value for the Squares test statistic T being larger or equal to `T_obs`, 
+Compute an approximation of P(T >= `T_obs` | `n * N`), the p value for the Squares test 
+statistic T being larger or equal to `T_obs`, 
 the value of the Squares statistic observed in the data. 
 The total number of datapoints is `n * N`.
 
-The approximation involves a 1D numerical integration whose relative and absolute target precision are `epsrel` and `epsabs`. 
-These are optional arguments here and if left empty, the default values of the `quadgk()` function are used. See https://juliamath.github.io/QuadGK.jl/stable/
+The approximation involves a 1D numerical integration whose relative and absolute target 
+precision are `epsrel` and `epsabs`. 
+These are optional arguments here and if left empty, the default values of the `quadgk()` 
+    function are used. See https://juliamath.github.io/QuadGK.jl/stable/
 
-Via `approx_cumulative` this function implements equation (17) from:
+Via `squares_cdf_approx()` this function implements equation (17) from:
 
 Frederik Beaujean and Allen Caldwell. *Is the bump significant? An axion-search example*
 
 https://arxiv.org/abs/1710.06642
   
 """
-function approx_pvalue(T_obs::Real, N::Integer, n::Real, epsrel::Real, epsabs::Real)
+function squares_pvalue_approx(T_obs::Real, N::Integer, n::Real, epsrel::Real, epsabs::Real)
 
-    return 1 - approx_cumulative(T_obs, N, n, epsrel, epsabs)
+    return 1 - squares_cdf_approx(T_obs, N, n, epsrel, epsabs)
 end
-
-
-

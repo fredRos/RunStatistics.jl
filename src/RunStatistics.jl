@@ -1,4 +1,5 @@
 # This file is a part of RunStatistics.jl, licensed under the MIT License (MIT).
+
 __precompile__()
 
 """
@@ -20,7 +21,6 @@ This code is based on the original implementation by Frederik Beaujean in c++ an
 https://github.com/fredRos/runs
 """
 module RunStatistics
-
 
 using Distributions
 using QuadGK

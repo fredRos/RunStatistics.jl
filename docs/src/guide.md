@@ -108,7 +108,7 @@ p = 1 - F(T_{obs} | nN)
 \end{align}
 ```
 
-``\Delta(T_{obs})`` is a correction term (see equation (13) in [^2]) whose computation involves a 1D numerical integration. This is performed with the `quadgk()` function from the [`QuadGK.jl`](https://juliapackages.com/p/quadgk) package. When calling the `approx_cumulative()` or `approx_pvalue()` functions, the optional arguments`epsrel` and `epsabs` are the relative and absolute target precision of the integration performed in `quadgk()`. If not specified, the default values of `quadgk()` are used. See [documentation](https://juliamath.github.io/QuadGK.jl/stable/).
+``\Delta(T_{obs})`` is a correction term (see equation (13) in [^2]) whose computation involves a 1D numerical integration. This is performed with the `quadgk()` function from the [`QuadGK.jl`](https://juliapackages.com/p/quadgk) package. When calling the `squares_cdf_approx()` or `squares_pvalue_approx()` functions, the optional arguments`epsrel` and `epsabs` are the relative and absolute target precision of the integration performed in `quadgk()`. If not specified, the default values of `quadgk()` are used. See [documentation](https://juliamath.github.io/QuadGK.jl/stable/).
 
 
 
