@@ -26,68 +26,13 @@ To install `RunStatistics.jl`, start Julia and run
 julia> using Pkg
 julia> pkg"add RunStatistics"
 ```
-
-## SQUARES statistic
-To use the RunStatistics.jl package after installing it, do:
-
+and 
 ```Julia
 julia> using RunStatistics
 ```
-When calculating the p value P(T >= T_obs | N) for a sequence of `N` independent observations with gaussian uncertainty, first the observed value of the `Squares test statistic` `T_obs` needs to be calculated. 
+to use the functions the package provides.
 
-`T_obs` denotes the largest `χ^2` of any run of consecutive successes (above expectation) in this sequence of observations.
-
-For the Squares statistic to be calculable, the observed data must satisfy following conditions:
-
-> 1. All observations {X_i} are independent. 
-> 2. Each observation is normally distributed, X_i ∼ N( µ_i, σ^2_i ). 
-> 3. Mean µ_i and variance σ^2_i are known.
-
-Calculating `T_obs` for the observed data X_i is done with the `t_obs()` function:
-
-```Julia
-T_obs = t_obs(X::AbstractArray, μ::Real, σ2::Real)
-```
-
-Where `X` is a vector containing the observations, and `μ` and `σ2` are their mean and variance.
-
-If the obvservations don't all have the same mean and variance, use:
-
-```Julia
-T_obs = T_obs(X::AbstractArray, μ::AbstractArray, σ2::AbstractArray)
-```
-
-with the i-th elements of `μ` and `σ2` being the mean and variance of the i-th element of `X`.
-
-The cumulative distribution `P(T < T_obs | N)` and the p value `P(T >= T_obs | N)` at the observed value `T_obs` are calculated with:
-
-```Julia 
-julia> cumulative(T_obs::Float64, N::Int)
-
-julia> pvalue(T_obs::Float64, N::Int)
-```
-
-### Approximation for large N
-
-For large `N`, the number of terms in the exact expression scales like `exp(N^1/2)/N` and quickly grows too large. An approximate formula is implemented here for cases when the total number of data points is `n*N`.
-
-So for example, if 50 000 data points were collected, choose `N = 50` and `n = 1000`.
-
-For this example the approximation the cumulative for `N = 50` is computed exactly and then further processed to obtain the desired approximation, via equation (17) from 
-
-Frederik Beaujean and Allen Caldwell. *Is the bump significant? An axion-search example* [arXiv:1710.06642](http://arxiv.org/abs/1710.06642)
-
-As a rule of thumb, `N` should not exceed `100`. 
-
-The cumulative distribution P(T < T_obs | n\*N) and the p value P(T >= T_obs | n\*N) are approximated by:
-
-```Julia 
-julia> approx_cumulative(T_obs::Float64, N::Int, n::Float64, [epsrel::Float64, epsabs::Float64])
-
-julia> approx_pvalue(T_obs::Float64, N::Int, n::Float64, [epsrel::Float64, epsabs::Float64])
-```
-
-The approximation involves a 1D numerical integration whose relative and absolute target precision are `epsrel` and `epsabs`; these are `optional arguments` in the above functions. 
+For an explanation on the theory behind the package and how to use it for your data, see the [Documentation for stable version](https://bat.github.io/RunStatistics.jl/stable).
 ## Documentation
 
 * [Documentation for stable version](https://bat.github.io/RunStatistics.jl/stable)
