@@ -130,7 +130,7 @@ https://arxiv.org/abs/1710.06642
 """
 function squares_cdf_approx(T_obs::Real, N::Integer, n::Real, epsrel::Real = nothing, epsabs::Real = nothing)
 
-    F = cumulative(T_obs, N)
+    F = squares_cdf(T_obs, N)
     Fn1 = (F / (1 + Delta(T_obs, N, N, epsrel, epsabs)[1]))^(n - 1)
     return F * Fn1
 end

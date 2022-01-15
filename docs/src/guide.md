@@ -25,7 +25,7 @@ julia> using RunStatistics
 to gain access to the functions provided in the package.
 
 
-## #TODO: Explain usage of package
+## Using RunStatistics.jl
 ---
 
 
