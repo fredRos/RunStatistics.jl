@@ -25,7 +25,6 @@ using Test
 
 end
 
-
 # NOTE:
 #= 
 
@@ -33,13 +32,12 @@ the number of partitions of an integer n into k parts satisfies the recurrence:
 p_k(n) = p_k(n - k) + p_k - 1(n - 1)
 with p_0(0) = 1 and p_k(n) = 0 uf n <= 0 or k <= 0 and n,k are not both 0
 
-Patition(6, 3)
-should therefore yield:
+The set of partitions of 6 into 3 parts should therefore contain:
 
 2*1 + 1*4
 1*1 + 1*2 + 1*3
 3*2
 
-as the partitions (note that the actual output of the function first has to be interpreted correctly, see docstring)
+as the partitions
 
 =#
