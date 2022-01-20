@@ -6,6 +6,10 @@
 Compute the value of the *Squares test statistic* `T_obs` i.e. the largest `χ2` of any run of consecutive successes (above expectation)
 in a sequence of `N` independent trials with Gaussian uncertainty. `μ` and `σ2` are the expectation and variance of the observations.
 
+Find the location(s) of the run(s) that produces `T_obs`.
+
+Returns `T_obs` and an one or more arrays containing the indices of the runs that produce `T_obs`.
+
 For the Squares statistic to be calculable, the observed data must satisfy following conditions:
 
         All observations {X_i} are independent. 
@@ -33,11 +37,29 @@ function t_obs(X::AbstractArray, μ::Real, σ2::Real)
     χ2 = T[]
     χi = zero(T)
 
-    @inbounds for i in eachindex(X)
-        X[i] > μ ? χi += (X[i] - μ)^2 / σ2 : (append!(χ2, χi); χi = 0)
+    locs_cache = Array[]
+    locs_run = Integer[]
+    locs = Any[]
+
+    @inbounds for i in eachindex(X) 
+
+        X[i] > μ ? (χi += (X[i] - μ)^2 / σ2; append!(locs_run, i)) : (χi > 0 && append!(χ2, χi); isempty(locs_run) || append!(locs_cache, [locs_run]); χi = 0; locs_run = Integer[])
+
     end
 
-    return maximum(χ2)
+    locs_ids = findall(x -> x == maximum(χ2), χ2)
+
+    if length(locs_ids) == 1 
+
+        return maximum(χ2), locs_cache[locs_ids[1]]
+
+    else
+        for i in locs_ids
+            append!(locs, locs_cache[i])
+        end
+    end 
+
+    return maximum(χ2), locs
 end
 
 function t_obs(X::AbstractArray, μ::AbstractArray, σ2::AbstractArray)
@@ -48,9 +70,25 @@ function t_obs(X::AbstractArray, μ::AbstractArray, σ2::AbstractArray)
     χ2 = T[]
     χi = zero(T)
 
+    locs_cache = AbstractArray[]
+    locs_run = Integer[]
+    locs = AbstractArray[]
+
     @inbounds for i in eachindex(X)
-        X[i] > μ[i] ? χi += (X[i] - μ[i])^2 / σ2[i] : (append!(χ2, χi); χi = 0)
+        X[i] > μ[i] ? (χi += (X[i] - μ[i])^2 / σ2[i]; append!(locs_run, i)) : (χi > 0 && append!(χ2, χi); isempty(locs_run) || append!(locs_cache, [locs_run]); χi = 0; locs_run = Integer[])
     end
 
-    return maximum(χ2)
+    locs_ids = findall(x -> x == maximum(χ2), χ2)
+
+    if length(locs_ids) == 1 
+
+        return maximum(χ2), locs_cache[locs_ids[1]]
+
+    else
+        for i in locs_ids
+            append!(locs, locs_cache[i])
+        end
+    end 
+
+    return maximum(χ2), locs
 end
