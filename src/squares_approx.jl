@@ -102,7 +102,7 @@ relative and absolute target precision `epsrel` and `epsabs`. If not specified, 
 values of `quadgk()` are used.
 See https://juliamath.github.io/QuadGK.jl/stable/ for documentation.
 """
-function Delta(T_obs::Real, Nl::Integer, Nr::Integer, epsrel::Real = nothing, epsabs::Real = nothing)
+function Delta(T_obs::Real, Nl::Integer, Nr::Integer, epsrel::Nothing = nothing, epsabs::Real = nothing)
 
     F = IntegrandData(T_obs, Nl, Nr)
     return quadgk(F, 0, T_obs, rtol = epsrel, atol = epsabs, order = 10)
