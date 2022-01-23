@@ -128,11 +128,30 @@ Frederik Beaujean and Allen Caldwell. *Is the bump significant? An axion-search 
 https://arxiv.org/abs/1710.06642
   
 """
-function squares_cdf_approx(T_obs::Real, N::Integer, n::Real, epsrel::Real = nothing, epsabs::Real = nothing)
+function squares_cdf_approx(T_obs::Real, L::Integer, epsp::Real = 0, epsrel::Real = nothing, epsabs::Real = nothing)
+    N = 80
+    n = L / N
+    
+    F = squares_cdf(T_obs, N)
+    Fn1 = (F / (1 + Delta(T_obs, N, N, epsrel, epsabs)[1]))^(n - 1)
+
+    if epsp == 0 || (epsp / n) > 10^(-10)
+        return F * Fn1
+    end  
+    
+    error("The desired accuracy has not been reached, see documentation on Accuracy")
+end
+
+function squares_cdf_approx(T_obs::Real, N::Integer, n::Real,  epsp::Real = 0, epsrel::Real = nothing, epsabs::Real = nothing)
 
     F = squares_cdf(T_obs, N)
     Fn1 = (F / (1 + Delta(T_obs, N, N, epsrel, epsabs)[1]))^(n - 1)
-    return F * Fn1
+    
+    if epsp == 0 || (epsp / n) > 10^(-10)
+        return F * Fn1
+    end  
+    
+    error("The desired accuracy has not been reached, see documentation on Accuracy")
 end
 
 """
@@ -155,7 +174,12 @@ Frederik Beaujean and Allen Caldwell. *Is the bump significant? An axion-search 
 https://arxiv.org/abs/1710.06642
   
 """
-function squares_pvalue_approx(T_obs::Real, N::Integer, n::Real, epsrel::Real, epsabs::Real)
+function squares_pvalue_approx(T_obs::Real, L::Integer,  epsp::Real = 0, epsrel::Real = nothing, epsabs::Real = nothing)
 
-    return 1 - squares_cdf_approx(T_obs, N, n, epsrel, epsabs)
+    return 1 - squares_cdf_approx(T_obs, L, epsp, epsrel, epsabs)
+end
+
+function squares_pvalue_approx(T_obs::Real, N::Integer, n::Real,  epsp::Real = 0, epsrel::Real = nothing, epsabs::Real = nothing)
+
+    return 1 - squares_cdf_approx(T_obs, N, n, epsp, epsrel, epsabs)
 end
