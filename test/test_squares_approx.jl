@@ -11,6 +11,6 @@ using Test
     epsrel = 0.1
     epsabs = 0.001
 
-    @test squares_pvalue_approx(T_obs, N, n, epsrel, epsabs) ≈ 0.24164150728705625
-    @test squares_cdf_approx(T_obs, N, n, epsrel, epsabs) ≈ 0.7583584927129438
+    @test squares_pvalue_approx(T_obs, N, n, 0, epsrel, epsabs) ≈ 0.24164150728705625
+    @test squares_cdf_approx(T_obs, N, n, 0, epsrel, epsabs) ≈ 0.7583584927129438
 end
