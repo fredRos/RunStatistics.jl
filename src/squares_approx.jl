@@ -102,7 +102,7 @@ relative and absolute target precision `epsrel` and `epsabs`. If not specified, 
 values of `quadgk()` are used.
 See https://juliamath.github.io/QuadGK.jl/stable/ for documentation.
 """
-function Delta(T_obs::Real, Nl::Integer, Nr::Integer, epsrel::Real, epsabs::Real)
+function Delta(T_obs::Real, Nl::Integer, Nr::Integer, epsrel::Real = nothing, epsabs::Real = nothing)
 
     F = IntegrandData(T_obs, Nl, Nr)
     return quadgk(F, 0, T_obs, rtol = epsrel, atol = epsabs, order = 10)
@@ -128,30 +128,40 @@ Frederik Beaujean and Allen Caldwell. *Is the bump significant? An axion-search 
 https://arxiv.org/abs/1710.06642
   
 """
-function squares_cdf_approx(T_obs::Real, L::Integer, epsp::Real = 0, epsrel::Real = nothing, epsabs::Real = nothing)
+function squares_cdf_approx(T_obs::Real, L::Integer, epsp::Real = 0)
     N = 80
     n = L / N
-    
-    F = squares_cdf(T_obs, N)
-    Fn1 = (F / (1 + Delta(T_obs, N, N, epsrel, epsabs)[1]))^(n - 1)
 
-    if epsp == 0 || (epsp / n) > 10^(-10)
+    @argcheck (epsp == 0 || epsp / n >= 10^(-15)) error("The desired accuracy is to high. See documentation on Accuracy.")
+
+    if epsp != 0
+
+        epsabs = epsp / n
+        F = squares_cdf(T_obs, N)
+        Fn1 = (F / (1 + Delta(T_obs, N, N, nothing, epsabs)[1]))^(n - 1)
         return F * Fn1
-    end  
-    
-    error("The desired accuracy has not been reached, see documentation on Accuracy")
+    end
+        
+    F = squares_cdf(T_obs, N)
+    Fn1 = (F / (1 + Delta(T_obs, N, N)[1]))^(n - 1)
+    return F * Fn1
 end
 
-function squares_cdf_approx(T_obs::Real, N::Integer, n::Real,  epsp::Real = 0, epsrel::Real = nothing, epsabs::Real = nothing)
+function squares_cdf_approx(T_obs::Real, N::Integer, n::Real,  epsp::Real = 0)
 
-    F = squares_cdf(T_obs, N)
-    Fn1 = (F / (1 + Delta(T_obs, N, N, epsrel, epsabs)[1]))^(n - 1)
-    
-    if epsp == 0 || (epsp / n) > 10^(-10)
+    @argcheck (epsp == 0 || epsp / n >= 10^(-15)) error("The desired accuracy is to high. See documentation on Accuracy.")
+
+    if epsp != 0
+
+        epsabs = epsp / n
+        F = squares_cdf(T_obs, N)
+        Fn1 = (F / (1 + Delta(T_obs, N, N, nothing, epsabs)[1]))^(n - 1)
         return F * Fn1
-    end  
-    
-    error("The desired accuracy has not been reached, see documentation on Accuracy")
+    end
+        
+    F = squares_cdf(T_obs, N)
+    Fn1 = (F / (1 + Delta(T_obs, N, N)[1]))^(n - 1)
+    return F * Fn1
 end
 
 """
@@ -174,12 +184,12 @@ Frederik Beaujean and Allen Caldwell. *Is the bump significant? An axion-search 
 https://arxiv.org/abs/1710.06642
   
 """
-function squares_pvalue_approx(T_obs::Real, L::Integer,  epsp::Real = 0, epsrel::Real = nothing, epsabs::Real = nothing)
+function squares_pvalue_approx(T_obs::Real, L::Integer,  epsp::Real = 0)
 
-    return 1 - squares_cdf_approx(T_obs, L, epsp, epsrel, epsabs)
+    return 1 - squares_cdf_approx(T_obs, L, epsp)
 end
 
-function squares_pvalue_approx(T_obs::Real, N::Integer, n::Real,  epsp::Real = 0, epsrel::Real = nothing, epsabs::Real = nothing)
+function squares_pvalue_approx(T_obs::Real, N::Integer, n::Real,  epsp::Real = 0)
 
-    return 1 - squares_cdf_approx(T_obs, N, n, epsp, epsrel, epsabs)
+    return 1 - squares_cdf_approx(T_obs, N, n, epsp)
 end
