@@ -34,14 +34,14 @@ When using `RunStatistics.jl` for research, teaching or similar, please cite the
 
 ```
 @article{beaujean2011test,
-title={A test statistic for weighted runs},
-author={Beaujean, Frederik and Caldwell, Allen},
-journal={Journal of Statistical Planning and Inference},
-volume={141},
-number={11},
-pages={3437--3446},
-year={2011},
-publisher={Elsevier}
+  title={A test statistic for weighted runs},
+  author={Beaujean, Frederik and Caldwell, Allen},
+  journal={Journal of Statistical Planning and Inference},
+  volume={141},
+  number={11},
+  pages={3437--3446},
+  year={2011},
+  publisher={Elsevier}
 }
 
 @article{Beaujean:2017eyq,

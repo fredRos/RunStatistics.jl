@@ -5,7 +5,7 @@
 [![Build Status](https://github.com/bat/RunStatistics.jl/workflows/CI/badge.svg?branch=main)](https://github.com/bat/RunStatistics.jl/actions?query=workflow%3ACI)
 [![Codecov](https://codecov.io/gh/bat/RunStatistics.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/bat/RunStatistics.jl)
 
-This package implements the evaluation of the cumulative distribution function P(T < T_obs | N) of the weighted-runs statistic  originally defined in 
+This package implements the evaluation of the cumulative distribution function `P(T < T_obs | N)` of the weighted-runs statistic  originally defined in 
 
 Frederik Beaujean and Allen Caldwell. *A Test Statistic for Weighted Runs*. Journal of Statistical Planning and Inference 141, no. 11 (November 2011): 3437–46. [doi:10.1016/j.jspi.2011.04.022](http://dx.doi.org/10.1016/j.jspi.2011.04.022) [arXiv:1005.3233](http://arxiv.org/abs/1005.3233)
 
@@ -45,14 +45,14 @@ When using RunStatistics.jl for research, teaching or similar, please cite the o
 
 ```
 @article{beaujean2011test,
-title={A test statistic for weighted runs},
-author={Beaujean, Frederik and Caldwell, Allen},
-journal={Journal of Statistical Planning and Inference},
-volume={141},
-number={11},
-pages={3437--3446},
-year={2011},
-publisher={Elsevier}
+  title={A test statistic for weighted runs},
+  author={Beaujean, Frederik and Caldwell, Allen},
+  journal={Journal of Statistical Planning and Inference},
+  volume={141},
+  number={11},
+  pages={3437--3446},
+  year={2011},
+  publisher={Elsevier}
 }
 
 @article{Beaujean:2017eyq,

@@ -28,7 +28,7 @@ to gain access to the functions provided in the package.
 ## Using RunStatistics.jl
 ---
 
-To use the ``RunStatistics.jl` to calculate and interpret the Squares statistic for the data you observed, first make sure it satisfies these conditions:
+To use the `RunStatistics.jl` to calculate and interpret the Squares statistic for the data you observed, first make sure it satisfies these conditions:
 
 - All observations ``\{X_i\}`` are independent. 
 - Each observation is normally distributed, ``X_i \sim \mathcal{N}(\mu_i, \sigma^2_i)``
@@ -37,8 +37,6 @@ To use the ``RunStatistics.jl` to calculate and interpret the Squares statistic 
 If your data satisfies these conditions, bring it into the form of an array `X` of length `N`, so that `X[i]` contains the i-th observation.
 
 To obtain the p-value for the value of the Squares statistic observed in your data, do this:
-
-#TODO: explain main function
 
 ### Calculate ``T_{obs}``
 
@@ -50,6 +48,8 @@ julia> t_obs(X, μ, σ2)
 
 where ``\mu`` and ``\sigma 2`` are the mean and variance of the normal distribution the data follows.
 
+`t_obs()` returns a tuple containing the desired value ``T_{obs}`` as well as one or more arrays containing the indices ``i`` of the observations ``\{X_i\}`` in the run(s) that produce ``T_{obs}``. (It is generally possible that more than one run produces the same value for ``T``.)
+
 In case the observations ``\{X_i\}`` have individual expectations and variances, do:
 
 ```Julia
@@ -60,7 +60,7 @@ But with ``\mu`` and ``\sigma 2`` being *Arrays* where ``\mu[i]`` and ``\sigma 2
 
 ### Calculate the p-value, Evaluate the cumulative distribution function of ``T``
 
-To obtain the p-value given the value of ``T_{obs}`` for `N` data points, or evaluate the cumulative distribution function of ``T`` do:
+To obtain the exact p-value given the value of ``T_{obs}`` for ``N \lesssim 100`` data points, or evaluate the cumulative distribution function of ``T`` do:
 
 ```Julia
 julia> squares_pvalue(T_obs, N)
@@ -70,24 +70,22 @@ or
 julia> squares_cdf(T_obs, N)
 ```
 
-In case the number ``L`` of observations in the data set exceeds ``L \gtrsim 80``, do:
+In case the number ``L`` of observations in the data set exceeds ``L \gtrsim 100``, do:
 
 ```Julia
-julia> squares_pvalue_approx(T_obs, N, n)
+julia> squares_pvalue_approx(T_obs, L)
 ```
 or
 ```Julia
-julia> squares_cdf_approx(T_obs, N, n)
+julia> squares_cdf_approx(T_obs, L)
 ```
+To obtain the approximation for the p-value or the cumulative.
 
-so that ``L = n \cdot N``, ``n`` does not need to be an integer. For information on the choice of ``n`` and ``N``, see [Approximation for large numbers of data](@ref).
-
-
-There is the option to specify the error tolerance of the numerical integration performed during the approximation here, for details see [Approximation for large numbers of data](@ref).
+It is possible to control the approximation more accurately with additional methods and optional input arguments. See [Approximation for large numbers of data](@ref) below for more information.
 ## Details of computation
 ---
 
-In the following some more in-depth information on the calculations performed with `RunStatistics` is given.
+In the following some more in-depth information on the calculations performed with `RunStatistics.jl` is given.
 
 As during the derivation of the p-value for ``T`` in [^1], the quantity that is being computed here is 
 
@@ -105,7 +103,7 @@ The central calculation in this package implements Equation (16) from [^1]:
 P(T < T_{obs} | N) = \sum_{r = 1}^{N}\sum_{M = 1}^{M_{max}}\sum_{\pi} X(T_{obs}, N)
 ```
 
-The full derivation of ``P(T < T_{obs} | N)`` and an explanation for the parameters in the above equation can be found in section 2. of [^1]. 
+The full derivation of ``P(T < T_{obs} | N)`` and an explanation for the parameters in the above equation can be found in section 2 of [^1]. 
 
 For this manual, suffice it to say that the only input parameters that need to be known are ``T_{obs}`` and ``N``, the total number of observed data points. The other parameters are then calculated from them.
 
@@ -141,9 +139,23 @@ The function that updates a partition is `next_partition!()` it implements a mod
 *A. Zoghbi: Algorithms for generating integer partitions, Ottawa (1993)*. 
 ### Approximation for large numbers of data
 ---
-#TODO: discuss choice of n and N
+As discussed in the [Introduction](@ref) the method for approximating the value of the cumulative for large numbers ``L`` of observations involves splitting L into ``n`` sequences containing ``N`` observations. 
 
-For the approximation of the p-value of the Squares statistic for large numbers of data, this package implements equation (17) from [^2]:
+The original paper's[^2] authors have tested different combinations of ``n`` and ``N`` and found that they agree up to nine significant digits.
+
+The default values in this package are ``N = 80`` and ``n = L / N``, but user defined choices can also be used by calling:
+
+```Julia
+julia> squares_pvalue_approx(T_obs, N, n)
+```
+or
+```Julia
+julia> squares_cdf_approx(T_obs, N, n)
+```
+
+``n`` does not need to be an integer.
+
+For these approximations, this package implements equation (17) from [^2]:
 
 ```math
 \begin{align}
@@ -153,7 +165,7 @@ F(T_{obs} | nN) = \frac{F(T_{obs} | N)^n}{(1 + \Delta(T_{obs}))^{n-1}} \quad \te
 
 ``F(T_{obs} | L) \equiv P(T < T_{obs} | N)`` denotes the value of the cumulative of ``T`` for a sequence of ``L`` observations. 
 
-So if a total number of ``L`` data points have been observed, choose ``n`` and ``N`` so that ``n \cdot N = L``. The exact value of P(T < T_obs | N) is then calculated and further processed in accordance with the above equation.
+So, if a total number of ``L`` data points have been observed, choose ``n`` and ``N`` so that ``n \cdot N = L``. The exact value of ``P(T < T_obs | N)`` is then calculated and further processed in accordance with the above equation.
 
 The approximate p-value for the data set then is:
 
@@ -163,9 +175,56 @@ p = 1 - F(T_{obs} | nN)
 \end{align}
 ```
 
-``\Delta(T_{obs})`` is a correction term (see equation (13) in [^2]) whose computation involves a 1D numerical integration. This is performed with the `quadgk()` function from the [`QuadGK.jl`](https://juliapackages.com/p/quadgk) package. When calling the `squares_cdf_approx()` or `squares_pvalue_approx()` functions, the optional arguments `epsrel` and `epsabs` are the relative and absolute target precision of the integration performed in `quadgk()`. If not specified, the default values of `quadgk()` are used. See [documentation](https://juliamath.github.io/QuadGK.jl/stable/).
+``\Delta(T_{obs})`` is a correction term (see equation (13) in [^2]) whose computation involves a 1D numerical integration. This is performed with the `quadgk()` function from the [`QuadGK.jl`](https://juliapackages.com/p/quadgk) package.
 
 
+### Accuracy
+---
+
+The precision of the Approximation of ``F(T | nN)`` can be evaluated as:
+
+```math
+\begin{align}
+dF(T | nN) \leq n ~ dF(T | N) \oplus (1 - n) ~ d\Delta(T)
+\end{align}
+```
+where ``\oplus`` indicates addition in quadrature (See section C of [^2]). 
+
+To reach a given precision ``\epsilon`` on ``p`` or ``F(T | nN)``, it is required that ``F(T | N)`` and ``\Delta(T)`` are evaluated to an absolute precision ``\epsilon/n``. The calculation of ``F(T | N)`` is performed to double floating point precision, so up to an absolute precision of at least ``10^{-15}``, which limits the possible precision of ``p`` and ``F(T | nN)``.
+
+
+As an example, for ``L = 10^6``, ``N = 100``, and ``\epsilon = 10^{−5}``, we would need an absolute precision on ``F(T | N)`` and ``\Delta(T)`` at the ``10^{−9}`` level.
+
+To assure this level is reached, the additional argument `epsp` in the `squares_pvalue_approx()` and `squares_cdf_approx()` functions can be specified:
+
+```Julia
+julia> squares_pvalue_approx(T_obs, L, epsp)
+```
+or
+```Julia
+julia> squares_cdf_approx(T_obs, L, epsp)
+```
+
+This call yields a conservative approximation by setting the absolute error tolerance of the 1D integration that yields ``\Delta(T)`` to be one order of magnitude greater than necessary for the desired accuracy `epsp` of ``p`` or the cumulative. If not specified, the default value of the `quadgk()` function used for the integration is used. See [documentation](https://juliamath.github.io/QuadGK.jl/stable/).
+
+**Rule of thumb**: to obtain a quick approximation of ``p`` or ``F(T | nN)``, call:
+
+```Julia
+julia> squares_pvalue_approx(T_obs, L)
+```
+or
+```Julia
+julia> squares_cdf_approx(T_obs, L)
+```
+And if a certain accuracy `epsp` ``\leq 10^{-14}`` is desired, call:
+
+```Julia
+julia> squares_pvalue_approx(T_obs, L, epsp)
+```
+or
+```Julia
+julia> squares_cdf_approx(T_obs, L, epsp)
+```
 
 [^1]: Frederik Beaujean and Allen Caldwell. *A Test Statistic for Weighted Runs*. Journal of Statistical Planning and Inference 141, no. 11 (November 2011): 3437–46. [doi:10.1016/j.jspi.2011.04.022](https://dx.doi.org/10.1016/j.jspi.2011.04.022) [arXiv:1005.3233](https://arxiv.org/abs/1005.3233)
 

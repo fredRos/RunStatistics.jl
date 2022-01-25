@@ -109,17 +109,15 @@ function Delta(T_obs::Real, Nl::Integer, Nr::Integer, epsrel::Nothing = nothing,
 end
 
 """
-squares_cdf_approx(T_obs::Real, N::Integer, n::Real, [epsrel::Real, epsabs::Real])
+squares_cdf_approx(T_obs::Real, L::Integer, [epsp::Real])
 
-Compute an approximation of P(T < `T_obs` | `n * N`), the value of the cumulative distribution 
+Compute an approximation of P(T < `T_obs` | `L = n * N`), the value of the cumulative distribution 
 function for the Squares test statistic at `T_obs`, 
 the value of the Squares statistic observed in the data. 
-The total number of datapoints is `n * N`
+The total number of datapoints is `L = n * N`, if not defined otherwise, the function chooses the default values `N = 80` and `n = L / N`.
 
-The approximation involves a 1D numerical integration whose relative and absolute target 
-precision are `epsrel` and `epsabs`. 
-These are optional arguments here and if left empty, the default values of the `quadgk()` 
-    function are used. See https://juliamath.github.io/QuadGK.jl/stable/
+The accuracy's lower bound is `10^(-14)`, a desired accuracy up to this boundary can be specified with the optional `epsp` argument.
+See documentation on Accuracy.
 
 This function implements equation (17) from:
 
@@ -132,11 +130,11 @@ function squares_cdf_approx(T_obs::Real, L::Integer, epsp::Real = 0)
     N = 80
     n = L / N
 
-    @argcheck (epsp == 0 || epsp / n >= 10^(-15)) error("The desired accuracy is to high. See documentation on Accuracy.")
+    @argcheck (epsp == 0 || epsp / n >= 10^(-14)) error("The desired accuracy is too high. See documentation on Accuracy.")
 
     if epsp != 0
 
-        epsabs = epsp / n
+        epsabs = (epsp / n) * 0.1
         F = squares_cdf(T_obs, N)
         Fn1 = (F / (1 + Delta(T_obs, N, N, nothing, epsabs)[1]))^(n - 1)
         return F * Fn1
@@ -149,11 +147,11 @@ end
 
 function squares_cdf_approx(T_obs::Real, N::Integer, n::Real,  epsp::Real = 0)
 
-    @argcheck (epsp == 0 || epsp / n >= 10^(-15)) error("The desired accuracy is to high. See documentation on Accuracy.")
+    @argcheck (epsp == 0 || epsp / n >= 10^(-14)) error("The desired accuracy is too high. See documentation on Accuracy.")
 
     if epsp != 0
 
-        epsabs = epsp / n
+        epsabs = (epsp / n) * 0.1
         F = squares_cdf(T_obs, N)
         Fn1 = (F / (1 + Delta(T_obs, N, N, nothing, epsabs)[1]))^(n - 1)
         return F * Fn1
@@ -170,12 +168,10 @@ end
 Compute an approximation of P(T >= `T_obs` | `n * N`), the p value for the Squares test 
 statistic T being larger or equal to `T_obs`, 
 the value of the Squares statistic observed in the data. 
-The total number of datapoints is `n * N`.
+The total number of datapoints is `L = n * N`, if not defined otherwise, the function chooses the default values `N = 80` and `n = L / N`.
 
-The approximation involves a 1D numerical integration whose relative and absolute target 
-precision are `epsrel` and `epsabs`. 
-These are optional arguments here and if left empty, the default values of the `quadgk()` 
-function are used. See https://juliamath.github.io/QuadGK.jl/stable/
+The accuracy's lower bound is `10^(-14)`, a desired accuracy up to this boundary can be specified with the optional `epsp` argument.
+See documentation on Accuracy.
 
 Via `squares_cdf_approx()` this function implements equation (17) from:
 

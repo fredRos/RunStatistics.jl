@@ -90,7 +90,7 @@ If ``\mathcal{H}`` is correct and all parameters are fixed, then ``p`` is a rand
 ### Approximation for large numbers of observations
 ---
 
-The cost for calculating the exact `p-value` for the Squares statistic as described in the initial paper[^1], scales with the number ``N`` of observations in a sequence of data like ``\exp[N^{\frac{1}{2}}]/N`` and quickly grows to large for ``N \gtrsim 80``. 
+The cost for calculating the exact `p-value` for the Squares statistic as described in the initial paper[^1], scales with the number ``N`` of observations in a sequence of data like ``\exp[N^{\frac{1}{2}}]/N`` and quickly grows too large for ``N \gtrsim 80``. 
 
 The authors derived an approximation for large numbers of data in the follow-up paper[^2].
 
