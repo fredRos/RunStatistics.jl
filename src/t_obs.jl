@@ -8,7 +8,7 @@ in a sequence of `N` independent trials with Gaussian uncertainty. `μ` and `σ2
 
 Find the location(s) of the run(s) that produces `T_obs`.
 
-Returns `T_obs` and an one or more arrays containing the indices of the runs that produce `T_obs`.
+Returns a tuple containing `T_obs` and one or more arrays containing the indices of the runs that produce `T_obs`.
 
 For the Squares statistic to be calculable, the observed data must satisfy following conditions:
 
