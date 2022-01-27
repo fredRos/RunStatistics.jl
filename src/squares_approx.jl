@@ -126,7 +126,7 @@ Frederik Beaujean and Allen Caldwell. *Is the bump significant? An axion-search 
 https://arxiv.org/abs/1710.06642
   
 """
-function squares_cdf_approx(T_obs::Real, L::Integer, epsp::Real = 0)
+function squares_cdf_approx(T_obs::Real, L::Integer, epsp::Real)
     N = 80
     n = L / N
 
@@ -145,7 +145,7 @@ function squares_cdf_approx(T_obs::Real, L::Integer, epsp::Real = 0)
     return F * Fn1
 end
 
-function squares_cdf_approx(T_obs::Real, N::Integer, n::Real,  epsp::Real = 0)
+function squares_cdf_approx(T_obs::Real, N::Integer, n::Real,  epsp::Real)
 
     @argcheck (epsp == 0 || epsp / n >= 10^(-14)) error("The desired accuracy is too high. See documentation on Accuracy.")
 
@@ -180,12 +180,12 @@ Frederik Beaujean and Allen Caldwell. *Is the bump significant? An axion-search 
 https://arxiv.org/abs/1710.06642
   
 """
-function squares_pvalue_approx(T_obs::Real, L::Integer,  epsp::Real = 0)
+function squares_pvalue_approx(T_obs::Real, L::Integer,  epsp::Real)
 
     return 1 - squares_cdf_approx(T_obs, L, epsp)
 end
 
-function squares_pvalue_approx(T_obs::Real, N::Integer, n::Real,  epsp::Real = 0)
+function squares_pvalue_approx(T_obs::Real, N::Integer, n::Real,  epsp::Real)
 
     return 1 - squares_cdf_approx(T_obs, N, n, epsp)
 end
