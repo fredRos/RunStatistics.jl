@@ -37,9 +37,11 @@ function t_obs(X::AbstractArray, μ::Real, σ2::Real)
     χ2 = T[]
     χi = zero(T)
 
-    locs_cache = Array[]
-    locs_run = Integer[]
-    locs = Any[]
+    locs_cache = Array{Array}(undef,0)
+    locs_run = Array{Int64}(undef,0)
+    locs = Array{Union{Array, Int64}}(undef,0)
+
+    run_at_end = false
 
     @inbounds for i in eachindex(X) 
 
@@ -47,15 +49,18 @@ function t_obs(X::AbstractArray, μ::Real, σ2::Real)
 
             χi += (X[i] - μ)^2 / σ2
             append!(locs_run, i)
-  
+            run_at_end = true
         else
             χi > 0 && append!(χ2, χi) 
             isempty(locs_run) || append!(locs_cache, [locs_run])
             χi = 0
-            locs_run = Integer[]
+            locs_run = Array{Int64}(undef,0)
+            run_at_end = false
         end 
 
     end
+
+    run_at_end && (append!(χ2, χi); append!(locs_cache, [locs_run]))
 
     locs_ids = findall(x -> x == maximum(χ2), χ2)
 
@@ -67,7 +72,7 @@ function t_obs(X::AbstractArray, μ::Real, σ2::Real)
 
         for i in locs_ids
 
-            append!(locs, locs_cache[i])
+            append!(locs, [locs_cache[i]])
         end
 
     end 
@@ -83,9 +88,11 @@ function t_obs(X::AbstractArray, μ::AbstractArray, σ2::AbstractArray)
     χ2 = T[]
     χi = zero(T)
 
-    locs_cache = AbstractArray[]
-    locs_run = Integer[]
-    locs = AbstractArray[]
+    locs_cache = Array{Array}(undef,0)
+    locs_run = Array{Int64}(undef,0)
+    locs = Array{Union{Array, Int64}}(undef,0)
+
+    run_at_end = false
 
     @inbounds for i in eachindex(X)
 
@@ -93,14 +100,17 @@ function t_obs(X::AbstractArray, μ::AbstractArray, σ2::AbstractArray)
 
             χi += (X[i] - μ[i])^2 / σ2[i]
             append!(locs_run, i)
+            run_at_end = true
         else
-
             χi > 0 && append!(χ2, χi)
             isempty(locs_run) || append!(locs_cache, [locs_run])
             χi = 0
             locs_run = Integer[]
+            run_at_end = false
         end
     end
+
+    run_at_end && (append!(χ2, χi); append!(locs_cache, [locs_run]))
 
     locs_ids = findall(x -> x == maximum(χ2), χ2)
 
@@ -111,7 +121,7 @@ function t_obs(X::AbstractArray, μ::AbstractArray, σ2::AbstractArray)
     else
         for i in locs_ids
 
-            append!(locs, locs_cache[i])
+            append!(locs, [locs_cache[i]])
         end
     end 
 
