@@ -6,10 +6,19 @@ using Test
 @testset "squares_approx" begin
     
     T_obs = 20
-    N = 30
-    n = 100
-    epsp = 10^(-2)
+    L = 800
+    N = 80
+    n = 10
+    epsp_1 = 10^(-2)
+    #TODO: check for zero case for "epsp". throws error in Delta function.
+    epsp_2 = 0
+       
 
-    @test squares_pvalue_approx(T_obs, N, n, epsp) ≈ 0.24164150728705625
-    @test squares_cdf_approx(T_obs, N, n, epsp) ≈ 0.7583584927129438
+    @test RunStatistics.squares_pvalue_approx(T_obs, N, n, epsp_1) ≈ 0.07082230261169509
+    @test RunStatistics.squares_cdf_approx(T_obs, N, n, epsp_1) ≈ 0.9291776973883049
+
+    @test RunStatistics.squares_cdf_approx(T_obs, L, epsp_1) ≈ 0.9291776973883049
+    @test RunStatistics.squares_pvalue_approx(T_obs, L, epsp_1) ≈ 0.07082230261169509
+
+
 end
