@@ -2,12 +2,6 @@
 
 export squares_cdf_approx, squares_pvalue_approx
 
-using ArgCheck
-using Distributions
-using QuadGK
-include("partitions.jl")
-include("squares.jl")
-
 """
     IntegrandData
 
