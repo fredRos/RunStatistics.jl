@@ -65,11 +65,6 @@ function squares_cdf(T_obs::Real, N::Integer)
 
     p = zero(T)
 
-    # p = Threads.Atomic{float(T)}(0)
-    # Ps = zeros(Real, numthreads)
-
-    #TODO: think about creating a Partition() object for each thread and then initiate it within the thread
-    #Threads.@threads 
     for r = 1:N
 
         Mmax = min(r, N - r + 1)
@@ -101,12 +96,10 @@ function squares_cdf(T_obs::Real, N::Integer)
                 done = next_partition!(g)
             end
 
-            #Ps[threadid()] += exp(scale + log(ppi))
             p += exp(scale + log(ppi))
         end
     end
-    #p = sum(Ps)
-
+    
     @assert p < 1
     return p
 end
