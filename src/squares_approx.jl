@@ -105,7 +105,8 @@ See https://juliamath.github.io/QuadGK.jl/stable/ for documentation.
 function Delta(T_obs::Real, Nl::Integer, Nr::Integer, epsrel::Nothing = nothing, epsabs::Union{Real, Nothing} = nothing)
 
     F = IntegrandData(T_obs, Nl, Nr)
-    return quadgk(F, 0, T_obs, rtol = epsrel, atol = epsabs, order = 10)
+    I = quadgk(F, 0, T_obs, rtol = epsrel, atol = epsabs, order = 10)
+    return I[1]
 end
 
 """
@@ -142,12 +143,12 @@ function squares_cdf_approx(T_obs::Real, L::Integer, epsp::Real = 0)
 
         epsabs = (epsp / n) * 0.1
         F = squares_cdf(T_obs, N)
-        Fn1 = (F / (1 + Delta(T_obs, N, N, nothing, epsabs)[1]))^(n - 1)
+        Fn1 = (F / (1 + Delta(T_obs, N, N, nothing, epsabs)))^(n - 1)
         return F * Fn1
     end
         
     F = squares_cdf(T_obs, N)
-    Fn1 = (F / (1 + Delta(T_obs, N, N)[1]))^(n - 1)
+    Fn1 = (F / (1 + Delta(T_obs, N, N)))^(n - 1)
     return F * Fn1
 end
 
@@ -162,12 +163,12 @@ function squares_cdf_approx(T_obs::Real, Ns::AbstractArray, epsp::Real = 0)
 
         epsabs = (epsp / n) * 0.1
         F = squares_cdf(T_obs, N)
-        Fn1 = (F / (1 + Delta(T_obs, N, N, nothing, epsabs)[1]))^(n - 1)
+        Fn1 = (F / (1 + Delta(T_obs, N, N, nothing, epsabs)))^(n - 1)
         return F * Fn1
     end
         
     F = squares_cdf(T_obs, N)
-    Fn1 = (F / (1 + Delta(T_obs, N, N)[1]))^(n - 1)
+    Fn1 = (F / (1 + Delta(T_obs, N, N)))^(n - 1)
     return F * Fn1
 end
 
