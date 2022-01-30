@@ -26,7 +26,6 @@ using Distributions
 using QuadGK
 using ArgCheck
 using Distributions
-# using Threads
 
 include("t_obs.jl")
 include("partitions.jl")

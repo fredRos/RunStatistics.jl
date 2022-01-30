@@ -1,6 +1,4 @@
 # This file is a part of RunStatistics.jl, licensed under the MIT License (MIT).
-using Random
-using ArgCheck
 
 """
     t_obs(X::AbstractArray, μ::Real, σ2::Real)
@@ -70,7 +68,7 @@ function t_obs(X::AbstractArray, μ::Real, σ2::Real)
         return maximum(χ2), locs_cache[locs_ids[1]]
 
     else
-        for i in locs_id
+        for i in locs_ids
             append!(locs, [locs_cache[i]])
         end
     end 
