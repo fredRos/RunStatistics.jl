@@ -118,10 +118,8 @@ The total number of datapoints is `L = n * N`, if not defined otherwise, the fun
 
 To specify a certain choice for `N` and `n`, do:
 
-    squares_cdf_approx(T_obs::Real, Ns::AbstractArray,  [epsp::Real])
+    squares_cdf_approx(T_obs::Real, N::Integer, n::Real, epsp::Real = 0)
  
-With `Ns` being an array holding `N::Integer` and `n::Real` as its first and second element: Ns = [N, n]
-
 The accuracy's lower bound is `10^(-14)`, a desired accuracy up to this boundary can be specified with the optional `epsp` argument.
 See documentation on Accuracy.
 
@@ -151,20 +149,23 @@ function squares_cdf_approx(T_obs::Real, L::Integer, epsp::Real = 0)
     return F * Fn1
 end
 
-function squares_cdf_approx(T_obs::Real, Ns::AbstractArray,  epsp::Real = 0)
+function squares_cdf_approx(T_obs::Real, Ns::AbstractArray, epsp::Real = 0)
 
-    @argcheck (epsp == 0 || epsp / Ns[2] >= 10^(-14)) error("The desired accuracy is too high. See documentation on Accuracy.")
+    N = Integer(Ns[1])
+    n = Ns[2]
+
+    @argcheck (epsp == 0 || epsp / n >= 10^(-14)) error("The desired accuracy is too high. See documentation on Accuracy.")
 
     if epsp != 0
 
-        epsabs = (epsp / Ns[2]) * 0.1
-        F = squares_cdf(T_obs, Ns[1])
-        Fn1 = (F / (1 + Delta(T_obs, Ns[1], Ns[1], nothing, epsabs)[1]))^(Ns[2] - 1)
+        epsabs = (epsp / n) * 0.1
+        F = squares_cdf(T_obs, N)
+        Fn1 = (F / (1 + Delta(T_obs, N, N, nothing, epsabs)[1]))^(n - 1)
         return F * Fn1
     end
         
-    F = squares_cdf(T_obs, Ns[1])
-    Fn1 = (F / (1 + Delta(T_obs, Ns[1], Ns[1])[1]))^(Ns[2] - 1)
+    F = squares_cdf(T_obs, N)
+    Fn1 = (F / (1 + Delta(T_obs, N, N)[1]))^(n - 1)
     return F * Fn1
 end
 
