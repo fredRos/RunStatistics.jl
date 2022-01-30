@@ -118,8 +118,10 @@ The total number of datapoints is `L = n * N`, if not defined otherwise, the fun
 
 To specify a certain choice for `N` and `n`, do:
 
-    squares_cdf_approx(T_obs::Real, N::Integer, n::Real, epsp::Real = 0)
- 
+    squares_cdf_approx(T_obs::Real,  Ns::AbstractArray, epsp::Real = 0)
+
+With `Ns` being an array holding `N::Integer` and `n::Real` as its first and second element: Ns = [N, n].
+
 The accuracy's lower bound is `10^(-14)`, a desired accuracy up to this boundary can be specified with the optional `epsp` argument.
 See documentation on Accuracy.
 
