@@ -159,18 +159,21 @@ end
 
 function squares_cdf_approx(T_obs::Real, Ns::AbstractArray,  epsp::Real = 0)
 
+    N = convert(Integer, Ns[1])
+    n = Ns[2]
+
     @argcheck (epsp == 0 || epsp / Ns[2] >= 10^(-14)) error("The desired accuracy is too high. See documentation on Accuracy.")
 
     if epsp != 0
 
-        epsabs = (epsp / Ns[2]) * 0.1
-        F = squares_cdf(T_obs, Ns[1])
-        Fn1 = (F / (1 + Delta(T_obs, Ns[1], Ns[1], nothing, epsabs)[1]))^(Ns[2] - 1)
+        epsabs = (epsp / n) * 0.1
+        F = squares_cdf(T_obs, N)
+        Fn1 = (F / (1 + Delta(T_obs, N, N, nothing, epsabs)[1]))^(n - 1)
         return F * Fn1
     end
         
-    F = squares_cdf(T_obs, Ns[1])
-    Fn1 = (F / (1 + Delta(T_obs, Ns[1], Ns[1])[1]))^(Ns[2] - 1)
+    F = squares_cdf(T_obs, N)
+    Fn1 = (F / (1 + Delta(T_obs, N, N)[1]))^(n - 1)
     return F * Fn1
 end
 
