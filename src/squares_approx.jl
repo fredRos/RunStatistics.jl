@@ -153,12 +153,14 @@ function squares_cdf_approx(T_obs::Real, L::Integer, epsp::Real = 0)
 end
 
 function squares_cdf_approx(T_obs::Real, Ns::AbstractArray, epsp::Real = 0)
+    
+    n = Ns[2]
 
     @argcheck (epsp == 0 || epsp / n >= 10^(-14)) error("The desired accuracy is too high. See documentation on Accuracy.")
     @argcheck typeof(Ns[1]) <: Integer error("Please input correct types for Ns: Ns = [N::Integer, n::Real]")
    
     N = Integer(Ns[1])
-    n = Ns[2]
+    
 
     if epsp != 0
 
