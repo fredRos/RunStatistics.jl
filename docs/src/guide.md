@@ -146,12 +146,14 @@ The original paper's[^2] authors have tested different combinations of ``n`` and
 The default values in this package are ``N = 80`` and ``n = L / N``, but user defined choices can also be used by calling:
 
 ```Julia
-julia> squares_pvalue_approx(T_obs, N, n)
+julia> squares_pvalue_approx(T_obs, Ns)
 ```
 or
 ```Julia
-julia> squares_cdf_approx(T_obs, N, n)
+julia> squares_cdf_approx(T_obs, Ns)
 ```
+
+Where `Ns` is an array containing `N::Integer` and `n::Real` as its first and second entry: `Ns = [N, n]`.
 
 ``n`` does not need to be an integer.
 
