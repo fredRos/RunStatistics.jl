@@ -1,20 +1,21 @@
 # RunStatistics.jl
 
-A package implementing the exact evaluation of the cumulative distribution function of the *Squares test statistic* ``T`` as defined in 
+A package implementing the exact evaluation of the cumulative distribution function of the *Squares test statistic* ``T`` as defined in
 
 Frederik Beaujean and Allen Caldwell. *A Test Statistic for Weighted Runs*. [doi:10.1016/j.jspi.2011.04.022](https://dx.doi.org/10.1016/j.jspi.2011.04.022) [arXiv:1005.3233](https://arxiv.org/abs/1005.3233)
 
-This package also includes an implementation of an approximation of this cumulative for the more general case of large numbers of observations, as derived in 
+This package also includes an implementation of an approximation of this cumulative for the more general case of large numbers of observations, as derived in
 
-Frederik Beaujean and Allen Caldwell. *Is the bump significant? An axion-search example* [arXiv:1710.06642](https://arxiv.org/abs/1710.06642)
+Frederik Beaujean and Allen Caldwell. *Is the bump significant? An axion-search example* [doi:10.1140/epjc/s10052-018-6217-y](http://dx.doi.org/10.1140/epjc/s10052-018-6217-y) [arXiv:1710.06642](https://arxiv.org/abs/1710.06642)
 
 This code is based on the [original implementation](https://github.com/fredRos/runs) by Frederik Beaujean in c++ and mathematica.
 
 ## Package Features
 ---
 
+<!-- Do you have measurements to support your claim that the performance is better in the julia implementation? -->
 - Calculate the [*p-value*](https://en.wikipedia.org/wiki/P-value) for the *Squares test statistic*[^1] ``T`` observed in ``N`` independent trials of gaussian uncertainty
-- Improved performance and readability over the [original implementation](https://github.com/fredRos/runs) thanks to Julia 
+- Improved performance and readability over the [original implementation](https://github.com/fredRos/runs) thanks to Julia
 - Inbuilt implementation for generating [*integer partitions*](https://en.wikipedia.org/wiki/Partition_(number_theory)) of an integer ``n`` into ``k`` parts
 
 ## Manual Outline
@@ -31,6 +32,8 @@ Depth = 3
 ---
 
 When using `RunStatistics.jl` for research, teaching or similar, please cite the original authors' work:
+
+<!-- TODO Update second reference to journal instead of ArXiv -->
 
 ```
 @article{beaujean2011test,

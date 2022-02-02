@@ -1,6 +1,6 @@
 # Guide
 ---
-The following guide provides information on how to install and use the `RunStatistics.jl` package and the functions it provides, and on some of their implementation. 
+The following guide provides information on how to install and use the `RunStatistics.jl` package and the functions it provides, and on some of their implementation.
 
 ```@contents
 Pages = ["guide.md"]
@@ -10,14 +10,14 @@ Depth = 3
 ## Installation
 ---
 
-To install `RunStatistics.jl`, start Julia and run 
+To install `RunStatistics.jl`, start Julia and run
 
 ```Julia
 julia> using Pkg
 julia> pkg"add RunStatistics"
 ```
 
-To use `RunStatistics.jl` after installation, run 
+To use `RunStatistics.jl` after installation, run
 
 ```Julia
 julia> using RunStatistics
@@ -28,13 +28,13 @@ to gain access to the functions provided in the package.
 ## Using RunStatistics.jl
 ---
 
-To use the `RunStatistics.jl` to calculate and interpret the Squares statistic for the data you observed, first make sure it satisfies these conditions:
+To use the `RunStatistics.jl` to calculate and interpret the Squares statistic for the data you observed, first make sure the following assumptions are valid:
 
-- All observations ``\{X_i\}`` are independent. 
+- All observations ``\{X_i\}`` are independent.
 - Each observation is normally distributed, ``X_i \sim \mathcal{N}(\mu_i, \sigma^2_i)``
 - Mean ``\mu_i`` and variance ``\sigma^2_i`` are known.
 
-If your data satisfies these conditions, bring it into the form of an array `X` of length `N`, so that `X[i]` contains the i-th observation.
+If your model satisfies these conditions, bring it into the form of an array `X` of length `N`, so that `X[i]` contains the i-th observation.
 
 To obtain the p-value for the value of the Squares statistic observed in your data, do this:
 
@@ -56,9 +56,9 @@ In case the observations ``\{X_i\}`` have individual expectations and variances,
 julia> t_obs(X, μ, σ2)
 ```
 
-But with ``\mu`` and ``\sigma 2`` being *Arrays* where ``\mu[i]`` and ``\sigma 2[i]`` are the mean and variance of the i-th element of `X`. 
+But with ``\mu`` and ``\sigma 2`` being *Arrays* where ``\mu[i]`` and ``\sigma 2[i]`` are the mean and variance of the i-th element of `X`.
 
-### Calculate the p-value, Evaluate the cumulative distribution function of ``T``
+### Calculate the p-value and evaluate the cumulative distribution function of ``T``
 
 To obtain the exact p-value given the value of ``T_{obs}`` for ``N \lesssim 100`` data points, or evaluate the cumulative distribution function of ``T`` do:
 
@@ -66,6 +66,7 @@ To obtain the exact p-value given the value of ``T_{obs}`` for ``N \lesssim 100`
 julia> squares_pvalue(T_obs, N)
 ```
 or
+<!-- the p value is defined as 1 - cdf. I don't know how you define the cdf in your code but it should follow that convention! -->
 ```Julia
 julia> squares_cdf(T_obs, N)
 ```
@@ -79,7 +80,7 @@ or
 ```Julia
 julia> squares_cdf_approx(T_obs, L)
 ```
-To obtain the approximation for the p-value or the cumulative.
+to obtain the approximation for the p-value or the cumulative.
 
 It is possible to control the approximation more accurately with additional methods and optional input arguments. See [Approximation for large numbers of data](@ref) below for more information.
 ## Details of computation
@@ -87,13 +88,13 @@ It is possible to control the approximation more accurately with additional meth
 
 In the following some more in-depth information on the calculations performed with `RunStatistics.jl` is given.
 
-As during the derivation of the p-value for ``T`` in [^1], the quantity that is being computed here is 
+Following the derivation of the p-value for ``T`` in [^1], the quantity that is being computed here is
 
 ```math
 P(T < T_{obs} | N)
 ```
 
-This is the value of the [cumulative distribution function](https://en.wikipedia.org/wiki/Cumulative_distribution_function) of ``T`` at the value ``T_{obs}`` observed in a sequence of ``N`` datapoints. 
+This is the value of the [cumulative distribution function](https://en.wikipedia.org/wiki/Cumulative_distribution_function) of ``T`` at the value ``T_{obs}`` observed in a sequence of ``N`` datapoints.
 
 The p-value then is obtained as ``p = 1- P(T < T_{obs} | N)``.
 
@@ -103,7 +104,7 @@ The central calculation in this package implements Equation (16) from [^1]:
 P(T < T_{obs} | N) = \sum_{r = 1}^{N}\sum_{M = 1}^{M_{max}}\sum_{\pi} X(T_{obs}, N)
 ```
 
-The full derivation of ``P(T < T_{obs} | N)`` and an explanation for the parameters in the above equation can be found in section 2 of [^1]. 
+The full derivation of ``P(T < T_{obs} | N)`` and an explanation for the parameters in the above equation can be found in section 2 of [^1].
 
 For this manual, suffice it to say that the only input parameters that need to be known are ``T_{obs}`` and ``N``, the total number of observed data points. The other parameters are then calculated from them.
 
@@ -116,7 +117,7 @@ When the cumulative of ``T`` is evaluated at ``T_{obs}`` for ``N`` data points, 
 
 In this package, a partition of an integer ``n`` into ``k`` parts is represented with a `Partition()` object. It holds the fields:
 
-    n::Int   
+    n::Int
     k::Int
     h::Int          Number of *distinct* parts
     c::Vector{Int}  Multiplicities of parts
@@ -134,12 +135,12 @@ So when reading a partition, always use the above equation: ignore the first ele
 
 To save memory during the evaluation of the cumulative, a partition object is initiated and updated in place during the summation over the set of possible partitions.
 
-The function that updates a partition is `next_partition!()` it implements a modified version of *Algorithm Z* from 
+The function that updates a partition is `next_partition!()`. It implements a modified version of *Algorithm Z* from
 
-*A. Zoghbi: Algorithms for generating integer partitions, Ottawa (1993)*. 
+*A. Zoghbi: Algorithms for generating integer partitions, Ottawa (1993)*.
 ### Approximation for large numbers of data
 ---
-As discussed in the [Introduction](@ref) the method for approximating the value of the cumulative for large numbers ``L`` of observations involves splitting L into ``n`` sequences containing ``N`` observations. 
+As discussed in the [Introduction](@ref) the method for approximating the value of the cumulative for large numbers ``L`` of observations involves splitting L into ``n`` sequences containing ``N`` observations.
 
 The original paper's[^2] authors have tested different combinations of ``n`` and ``N`` and found that they agree up to nine significant digits.
 
@@ -163,9 +164,9 @@ F(T_{obs} | nN) = \frac{F(T_{obs} | N)^n}{(1 + \Delta(T_{obs}))^{n-1}} \quad \te
 \end{align}
 ```
 
-``F(T_{obs} | L) \equiv P(T < T_{obs} | N)`` denotes the value of the cumulative of ``T`` for a sequence of ``L`` observations. 
+``F(T_{obs} | L) \equiv P(T < T_{obs} | N)`` denotes the value of the cumulative of ``T`` for a sequence of ``L`` observations.
 
-So, if a total number of ``L`` data points have been observed, choose ``n`` and ``N`` so that ``n \cdot N = L``. The exact value of ``P(T < T_obs | N)`` is then calculated and further processed in accordance with the above equation.
+So, if a total number of ``L`` data points have been observed, choose ``n`` and ``N`` so that ``n \cdot N = L``. The exact value of ``P(T < T_{obs} | N)`` is then calculated and further processed in accordance with the above equation.
 
 The approximate p-value for the data set then is:
 
@@ -188,7 +189,7 @@ The precision of the Approximation of ``F(T | nN)`` can be evaluated as:
 dF(T | nN) \leq n ~ dF(T | N) \oplus (1 - n) ~ d\Delta(T)
 \end{align}
 ```
-where ``\oplus`` indicates addition in quadrature (See section C of [^2]). 
+where ``\oplus`` indicates addition in quadrature (See section C of [^2]).
 
 To reach a given precision ``\epsilon`` on ``p`` or ``F(T | nN)``, it is required that ``F(T | N)`` and ``\Delta(T)`` are evaluated to an absolute precision ``\epsilon/n``. The calculation of ``F(T | N)`` is performed to double floating point precision, so up to an absolute precision of at least ``10^{-15}``, which limits the possible precision of ``p`` and ``F(T | nN)``.
 
