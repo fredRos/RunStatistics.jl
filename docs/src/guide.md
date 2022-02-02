@@ -165,9 +165,9 @@ F(T_{obs} | nN) = \frac{F(T_{obs} | N)^n}{(1 + \Delta(T_{obs}))^{n-1}} \quad \te
 \end{align}
 ```
 
-``F(T_{obs} | L) \equiv P(T < T_{obs} | N)`` denotes the value of the cumulative of ``T`` for a sequence of ``L`` observations. 
+``F(T_{obs} | L) \equiv P(T < T_{obs} | L)`` denotes the value of the cumulative of ``T`` for a (long) sequence of ``L`` observations. 
 
-So, if a total number of ``L`` data points have been observed, choose ``n`` and ``N`` so that ``n \cdot N = L``. The exact value of ``P(T < T_obs | N)`` is then calculated and further processed in accordance with the above equation.
+So, if a total number of ``L`` data points have been observed, choose ``n`` and ``N`` so that ``n \cdot N = L``. The exact value of ``F(T_{obs} | N) \equiv P(T < T_{obs} | N)`` is then calculated and further processed in accordance with the above equation.
 
 The approximate p-value for the data set then is:
 
@@ -209,6 +209,8 @@ julia> squares_cdf_approx(T_obs, L, epsp)
 
 This call yields a conservative approximation by setting the absolute error tolerance of the 1D integration that yields ``\Delta(T)`` to be one order of magnitude greater than necessary for the desired accuracy `epsp` of ``p`` or the cumulative. If not specified, the default value of the `quadgk()` function used for the integration is used. See [documentation](https://juliamath.github.io/QuadGK.jl/stable/).
 
+---
+
 **Rule of thumb**: to obtain a quick approximation of ``p`` or ``F(T | nN)``, call:
 
 ```Julia
@@ -218,7 +220,7 @@ or
 ```Julia
 julia> squares_cdf_approx(T_obs, L)
 ```
-And if a certain accuracy `epsp` ``\leq 10^{-14}`` is desired, call:
+And if a certain accuracy `epsp` ``\geq n \cdot 10^{-14}`` is desired, call:
 
 ```Julia
 julia> squares_pvalue_approx(T_obs, L, epsp)
