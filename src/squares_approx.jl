@@ -123,8 +123,8 @@ To specify a certain choice for `N` and `n`, do:
 
 With `Ns` being an array holding `N::Integer` and `n::Real` as its first and second element: Ns = [N, n].
 
-The accuracy's lower bound is `10^(-14)`, a desired accuracy up to this boundary can be specified with the optional `epsp` argument.
-See documentation on Accuracy.
+The accuracy's lower bound is `n * 10^(-14)`, a desired accuracy up to this boundary can be specified with the optional `epsp` argument.
+See documentation on Accuracy under `Guide/Details of computation`.
 
 This function implements equation (17) from:
 
@@ -189,8 +189,8 @@ To specify a certain choice for `N` and `n`, do:
  
 With `Ns` being an array holding `N::Integer` and `n::Real` as its first and second element: Ns = [N, n]
 
-The accuracy's lower bound is `10^(-14)`, a desired accuracy up to this boundary can be specified with the optional `epsp` argument.
-See documentation on Accuracy.
+The accuracy's lower bound is `n * 10^(-14)`, a desired accuracy up to this boundary can be specified with the optional `epsp` argument.
+See documentation on Accuracy under `Guide/Details of computation`.
 
 Via `squares_cdf_approx()` this function implements equation (17) from:
 
